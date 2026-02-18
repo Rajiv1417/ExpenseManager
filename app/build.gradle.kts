@@ -80,21 +80,21 @@ dependencies {
     // WorkManager
     implementation(libs.work.runtime.ktx)
 
-    // ML Kit OCR — version 16.x lives on Google Maven ✅
+    // ML Kit OCR
     implementation(libs.mlkit.text.recognition)
 
     // CSV
     implementation(libs.opencsv)
 
-    // Excel — Apache POI on Maven Central ✅
+    // Excel
     implementation(libs.poi.ooxml)
 
-    // PDF — iText 8 split modules on Maven Central ✅
+    // iText PDF — alias dashes map to dots in Kotlin DSL: libs.itext.kernel ✅
     implementation(libs.itext.kernel)
     implementation(libs.itext.layout)
     implementation(libs.itext.io)
 
-    // Charts — vico 2.x on Maven Central ✅
+    // Charts
     implementation(libs.vico.compose)
     implementation(libs.vico.core)
 
