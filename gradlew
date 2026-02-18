@@ -29,7 +29,7 @@ if [ ! -f "$WRAPPER_JAR" ]; then
     fi
 fi
 
-DEFAULT_JVM_OPTS='"-Xmx64m" "-Xms64m"'
+DEFAULT_JVM_OPTS="-Xmx64m -Xms64m"
 CLASSPATH="$APP_HOME/gradle/wrapper/gradle-wrapper.jar"
 
 # Find Java
