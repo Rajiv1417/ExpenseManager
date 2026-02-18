@@ -16,7 +16,6 @@ android {
         targetSdk = 35
         versionCode = 1
         versionName = "1.0"
-
         testInstrumentationRunner = "androidx.test.runner.AndroidJUnitRunner"
     }
 
@@ -81,21 +80,22 @@ dependencies {
     // WorkManager
     implementation(libs.work.runtime.ktx)
 
-    // ML Kit OCR
+    // ML Kit OCR — version 16.x lives on Google Maven ✅
     implementation(libs.mlkit.text.recognition)
 
     // CSV
     implementation(libs.opencsv)
 
-    // Excel
+    // Excel — Apache POI on Maven Central ✅
     implementation(libs.poi.ooxml)
 
-    // PDF
-    implementation(libs.itext.core)
+    // PDF — iText 8 split modules on Maven Central ✅
+    implementation(libs.itext.kernel)
+    implementation(libs.itext.layout)
+    implementation(libs.itext.io)
 
-    // Charts
+    // Charts — vico 2.x on Maven Central ✅
     implementation(libs.vico.compose)
-    implementation(libs.vico.compose.m3)
     implementation(libs.vico.core)
 
     // Image loading
