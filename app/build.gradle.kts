@@ -96,13 +96,13 @@ dependencies {
     implementation(libs.poi.ooxml)
 
     // iText 8 PDF — camelCase aliases match toml
-    implementation(libs.itextKernel)
-    implementation(libs.itextLayout)
-    implementation(libs.itextIo)
+    implementation(libs.itext.Kernel)
+    implementation(libs.itext.Layout)
+    implementation(libs.itext.Io)
 
     // Charts — vico 2.x camelCase aliases
-    implementation(libs.vicoCompose)
-    implementation(libs.vicoCore)
+    implementation(libs.vico.Compose)
+    implementation(libs.vico.Core)
 
     // Image loading
     implementation(libs.coil.compose)
