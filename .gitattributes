@@ -1,0 +1,22 @@
+# Binary files
+*.jar binary
+*.apk binary
+*.aab binary
+*.png binary
+*.jpg binary
+*.webp binary
+*.keystore binary
+
+# Gradle wrapper - treat as binary, don't diff
+gradle/wrapper/gradle-wrapper.jar binary
+
+# Line endings
+*.kt text eol=lf
+*.kts text eol=lf
+*.xml text eol=lf
+*.gradle text eol=lf
+*.md text eol=lf
+*.txt text eol=lf
+*.properties text eol=lf
+gradlew text eol=lf
+gradlew.bat text eol=crlf
