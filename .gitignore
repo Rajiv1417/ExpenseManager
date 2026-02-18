@@ -1,0 +1,49 @@
+### Android ###
+*.apk
+*.ap_
+*.aab
+*.dex
+*.class
+bin/
+gen/
+out/
+release/
+
+# Gradle files
+.gradle/
+build/
+/local.properties
+/.idea/caches
+/.idea/libraries
+/.idea/modules.xml
+/.idea/workspace.xml
+/.idea/navEditor.xml
+/.idea/assetWizardSettings.xml
+.DS_Store
+/captures
+.externalNativeBuild
+.cxx
+local.properties
+
+# NOTE: gradle-wrapper.jar is intentionally committed as a placeholder.
+# The real jar is auto-downloaded by gradlew on first run.
+# To replace with the real jar locally:
+#   curl -sL https://github.com/gradle/gradle/raw/v8.7.0/gradle/wrapper/gradle-wrapper.jar \
+#     -o gradle/wrapper/gradle-wrapper.jar
+
+# Keystore files - NEVER commit these
+*.jks
+*.keystore
+
+# Build outputs
+app/build/
+
+# IntelliJ IDEA
+*.iml
+*.ipr
+*.iws
+.idea/
+
+# OS
+.DS_Store
+Thumbs.db
