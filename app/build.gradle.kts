@@ -95,14 +95,12 @@ dependencies {
     // Excel
     implementation(libs.poi.ooxml)
 
-    // iText 8 PDF — camelCase aliases match toml
-    implementation(libs.itext.Kernel)
-    implementation(libs.itext.Layout)
-    implementation(libs.itext.Io)
-
-    // Charts — vico 2.x camelCase aliases
-    implementation(libs.vico.Compose)
-    implementation(libs.vico.Core)
+    // bulletproof — works regardless of TOML
+    implementation("com.itextpdf:kernel:8.0.3")
+    implementation("com.itextpdf:layout:8.0.3")
+    implementation("com.itextpdf:io:8.0.3")
+    implementation("com.patrykandpatrick.vico:compose-m3:2.0.0-alpha.28")
+    implementation("com.patrykandpatrick.vico:core:2.0.0-alpha.28")
 
     // Image loading
     implementation(libs.coil.compose)
