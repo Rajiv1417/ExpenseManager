@@ -5,6 +5,13 @@ import android.content.Intent
 import android.net.Uri
 import androidx.core.content.FileProvider
 import com.expensemanager.data.local.entities.TransactionEntity
+import com.itextpdf.kernel.colors.ColorConstants
+import com.itextpdf.kernel.pdf.PdfDocument
+import com.itextpdf.kernel.pdf.PdfWriter
+import com.itextpdf.layout.Document
+import com.itextpdf.layout.element.Cell
+import com.itextpdf.layout.element.Paragraph
+import com.itextpdf.layout.element.Table
 import com.opencsv.CSVWriter
 import org.apache.poi.xssf.usermodel.XSSFWorkbook
 import java.io.File
@@ -20,11 +27,7 @@ object ExportHelper {
         return try {
             val file = File(context.cacheDir, "transactions_export.csv")
             val writer = CSVWriter(FileWriter(file))
-
-            // Headers
             writer.writeNext(arrayOf("Date", "Type", "Amount", "Category", "Account", "Payee", "Notes", "Status", "Payment Type"))
-
-            // Rows
             transactions.forEach { tx ->
                 writer.writeNext(arrayOf(
                     tx.dateTime.format(dateFormatter),
@@ -49,8 +52,6 @@ object ExportHelper {
         return try {
             val workbook = XSSFWorkbook()
             val sheet = workbook.createSheet("Transactions")
-
-            // Header style
             val headerStyle = workbook.createCellStyle().apply {
                 val font = workbook.createFont()
                 font.bold = true
@@ -58,18 +59,11 @@ object ExportHelper {
                 fillForegroundColor = org.apache.poi.ss.usermodel.IndexedColors.LIGHT_BLUE.index
                 fillPattern = org.apache.poi.ss.usermodel.FillPatternType.SOLID_FOREGROUND
             }
-
-            // Create header row
             val headers = listOf("Date", "Type", "Amount", "Category ID", "Account ID", "Payee", "Notes", "Status", "Payment Type")
             val headerRow = sheet.createRow(0)
             headers.forEachIndexed { i, title ->
-                headerRow.createCell(i).apply {
-                    setCellValue(title)
-                    cellStyle = headerStyle
-                }
+                headerRow.createCell(i).apply { setCellValue(title); cellStyle = headerStyle }
             }
-
-            // Data rows
             transactions.forEachIndexed { idx, tx ->
                 val row = sheet.createRow(idx + 1)
                 row.createCell(0).setCellValue(tx.dateTime.format(dateFormatter))
@@ -82,9 +76,7 @@ object ExportHelper {
                 row.createCell(7).setCellValue(tx.status.name)
                 row.createCell(8).setCellValue(tx.paymentType.name)
             }
-
             headers.indices.forEach { sheet.autoSizeColumn(it) }
-
             val file = File(context.cacheDir, "transactions_export.xlsx")
             FileOutputStream(file).use { workbook.write(it) }
             workbook.close()
@@ -97,28 +89,19 @@ object ExportHelper {
     fun exportToPdf(context: Context, transactions: List<TransactionEntity>): Uri? {
         return try {
             val file = File(context.cacheDir, "transactions_export.pdf")
+            val writer = PdfWriter(file)
+            val pdf = PdfDocument(writer)
+            val document = Document(pdf)
 
-            val writer = com.itextpdf.kernel.pdf.PdfWriter(file)
-            val pdf = com.itextpdf.kernel.pdf.PdfDocument(writer)
-            val document = com.itextpdf.layout.Document(pdf)
+            document.add(Paragraph("Transaction Export").setFontSize(18f).setBold())
 
-            // Title
-            document.add(
-                com.itextpdf.layout.element.Paragraph("Transaction Export")
-                    .setFontSize(18f)
-                    .setBold()
-            )
-
-            // Table
-            val table = com.itextpdf.layout.element.Table(5)
+            val table = Table(5)
             listOf("Date", "Type", "Amount", "Payee", "Status").forEach { header ->
                 table.addHeaderCell(
-                    com.itextpdf.layout.element.Cell()
-                        .add(com.itextpdf.layout.element.Paragraph(header).setBold())
-                        .setBackgroundColor(com.itextpdf.kernel.colors.ColorConstants.LIGHT_GRAY)
+                    Cell().add(Paragraph(header).setBold())
+                        .setBackgroundColor(ColorConstants.LIGHT_GRAY)
                 )
             }
-
             transactions.forEach { tx ->
                 table.addCell(tx.dateTime.format(dateFormatter))
                 table.addCell(tx.type.name)
@@ -126,7 +109,6 @@ object ExportHelper {
                 table.addCell(tx.payee ?: "-")
                 table.addCell(tx.status.name)
             }
-
             document.add(table)
             document.close()
             getUriForFile(context, file)
@@ -135,9 +117,8 @@ object ExportHelper {
         }
     }
 
-    private fun getUriForFile(context: Context, file: File): Uri {
-        return FileProvider.getUriForFile(context, "${context.packageName}.fileprovider", file)
-    }
+    private fun getUriForFile(context: Context, file: File): Uri =
+        FileProvider.getUriForFile(context, "${context.packageName}.fileprovider", file)
 
     fun shareFile(context: Context, uri: Uri, mimeType: String) {
         val intent = Intent(Intent.ACTION_SEND).apply {
