@@ -38,12 +38,18 @@ android {
     }
     buildFeatures {
         compose = true
+        buildConfig = true
     }
     packaging {
         resources {
             excludes += "/META-INF/{AL2.0,LGPL2.1}"
             excludes += "/META-INF/DEPENDENCIES"
             excludes += "mozilla/public-suffix-list.txt"
+        }
+    }
+    testOptions {
+        unitTests {
+            isReturnDefaultValues = true
         }
     }
 }
@@ -89,14 +95,14 @@ dependencies {
     // Excel
     implementation(libs.poi.ooxml)
 
-    // iText PDF — alias dashes map to dots in Kotlin DSL: libs.itext.kernel ✅
-    implementation(libs.itext.kernel)
-    implementation(libs.itext.layout)
-    implementation(libs.itext.io)
+    // iText 8 PDF — camelCase aliases match toml
+    implementation(libs.itextKernel)
+    implementation(libs.itextLayout)
+    implementation(libs.itextIo)
 
-    // Charts
-    implementation(libs.vico.compose)
-    implementation(libs.vico.core)
+    // Charts — vico 2.x camelCase aliases
+    implementation(libs.vicoCompose)
+    implementation(libs.vicoCore)
 
     // Image loading
     implementation(libs.coil.compose)
