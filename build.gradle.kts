@@ -6,3 +6,9 @@ plugins {
     alias(libs.plugins.hilt.android) apply false
     alias(libs.plugins.ksp) apply false
 }
+buildscript {
+    repositories {
+        google()
+        mavenCentral()
+    }
+}
