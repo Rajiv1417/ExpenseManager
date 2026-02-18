@@ -1,6 +1,6 @@
 package com.expensemanager.utils
 
-import android.util.Log
+
 import java.time.LocalDateTime
 import java.time.format.DateTimeFormatter
 import java.util.Locale
@@ -23,7 +23,6 @@ enum class SmsTransactionType {
 
 object SmsParser {
 
-    private val TAG = "SmsParser"
 
     // ─── Amount Patterns ───────────────────────────────────────────────────────
     private val AMOUNT_PATTERNS = listOf(
@@ -108,7 +107,7 @@ object SmsParser {
                 bank = bank
             )
         } catch (e: Exception) {
-            Log.e(TAG, "Error parsing SMS: ${e.message}")
+            // Log: Error parsing SMS
             null
         }
     }
@@ -218,7 +217,7 @@ object SmsReader {
                 }
             }
         } catch (e: Exception) {
-            Log.e("SmsReader", "Error reading SMS: ${e.message}")
+            // Log: Error reading SMS
         }
 
         return results
