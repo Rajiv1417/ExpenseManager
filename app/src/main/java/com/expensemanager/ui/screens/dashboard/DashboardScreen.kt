@@ -6,17 +6,52 @@ import androidx.compose.animation.fadeIn
 import androidx.compose.animation.slideInVertically
 import androidx.compose.foundation.background
 import androidx.compose.foundation.clickable
-import androidx.compose.foundation.layout.*
+import androidx.compose.foundation.layout.Arrangement
+import androidx.compose.foundation.layout.Box
+import androidx.compose.foundation.layout.Column
+import androidx.compose.foundation.layout.PaddingValues
+import androidx.compose.foundation.layout.Row
+import androidx.compose.foundation.layout.Spacer
+import androidx.compose.foundation.layout.fillMaxSize
+import androidx.compose.foundation.layout.fillMaxWidth
+import androidx.compose.foundation.layout.height
+import androidx.compose.foundation.layout.padding
+import androidx.compose.foundation.layout.size
+import androidx.compose.foundation.layout.width
 import androidx.compose.foundation.lazy.LazyColumn
-import androidx.compose.foundation.lazy.LazyRow
 import androidx.compose.foundation.lazy.items
 import androidx.compose.foundation.shape.CircleShape
 import androidx.compose.foundation.shape.RoundedCornerShape
 import androidx.compose.material.icons.Icons
-import androidx.compose.material.icons.filled.*
-import androidx.compose.material.icons.outlined.*
-import androidx.compose.material3.*
-import androidx.compose.runtime.*
+import androidx.compose.material.icons.filled.AccountBalance
+import androidx.compose.material.icons.filled.Add
+import androidx.compose.material.icons.filled.FileUpload
+import androidx.compose.material.icons.filled.Settings
+import androidx.compose.material.icons.outlined.ReceiptLong
+import androidx.compose.material3.Card
+import androidx.compose.material3.CardDefaults
+import androidx.compose.material3.CircularProgressIndicator
+import androidx.compose.material3.Divider
+import androidx.compose.material3.FilledTonalButton
+import androidx.compose.material3.FloatingActionButton
+import androidx.compose.material3.Icon
+import androidx.compose.material3.IconButton
+import androidx.compose.material3.MaterialTheme
+import androidx.compose.material3.Scaffold
+import androidx.compose.material3.Tab
+import androidx.compose.material3.TabRow
+import androidx.compose.material3.Text
+import androidx.compose.material3.TextButton
+import androidx.compose.material3.TopAppBar
+import androidx.compose.material3.TopAppBarDefaults
+import androidx.compose.runtime.Composable
+import androidx.compose.runtime.collectAsState
+import androidx.compose.runtime.LaunchedEffect
+import androidx.compose.runtime.getValue
+import androidx.compose.runtime.mutableIntStateOf
+import androidx.compose.runtime.mutableStateOf
+import androidx.compose.runtime.remember
+import androidx.compose.runtime.setValue
 import androidx.compose.ui.Alignment
 import androidx.compose.ui.Modifier
 import androidx.compose.ui.draw.clip
@@ -26,34 +61,39 @@ import androidx.compose.ui.text.font.FontWeight
 import androidx.compose.ui.unit.dp
 import androidx.compose.ui.unit.sp
 import androidx.hilt.navigation.compose.hiltViewModel
+import com.expensemanager.data.local.entities.AccountEntity
 import com.expensemanager.data.local.entities.TransactionEntity
-import com.expensemanager.data.local.entities.TransactionType
 import com.expensemanager.ui.components.TransactionItem
-import com.expensemanager.ui.theme.ExpenseColor
-import com.expensemanager.ui.theme.IncomeColor
 import com.expensemanager.utils.CurrencyFormatter
 import java.time.LocalDateTime
 import java.time.format.DateTimeFormatter
 
-@OptIn(ExperimentalMaterial3Api::class)
 @Composable
 fun DashboardScreen(
     onAddTransaction: () -> Unit,
     onTransactionClick: (Long) -> Unit,
     onAccountsClick: () -> Unit,
+    onAccountDetailClick: (Long) -> Unit,
+    onRecordsClick: (List<Long>) -> Unit,
     onImportClick: () -> Unit,
     onSettingsClick: () -> Unit,
     viewModel: DashboardViewModel = hiltViewModel()
 ) {
     val uiState by viewModel.uiState.collectAsState()
     var selectedTab by remember { mutableIntStateOf(0) }
+    var selectedAccountIds by remember { mutableStateOf<Set<Long>>(emptySet()) }
+
+    LaunchedEffect(uiState.accounts) {
+        val activeIds = uiState.accounts.filter { it.isActive }.map { it.id }.toSet()
+        selectedAccountIds = if (selectedAccountIds.isEmpty()) activeIds else selectedAccountIds.intersect(activeIds)
+    }
 
     Scaffold(
         topBar = {
             TopAppBar(
                 title = {
                     Column {
-                        Text("Expense Manager", style = MaterialTheme.typography.titleLarge)
+                        Text("Home", style = MaterialTheme.typography.titleLarge)
                         Text(
                             LocalDateTime.now().format(DateTimeFormatter.ofPattern("MMMM yyyy")),
                             style = MaterialTheme.typography.bodySmall,
@@ -67,45 +107,26 @@ fun DashboardScreen(
                     actionIconContentColor = MaterialTheme.colorScheme.onPrimary
                 ),
                 actions = {
-                    IconButton(onClick = onImportClick) {
-                        Icon(Icons.Default.FileUpload, "Import")
-                    }
-                    IconButton(onClick = onAccountsClick) {
-                        Icon(Icons.Default.AccountBalance, "Accounts")
-                    }
-                    IconButton(onClick = onSettingsClick) {
-                        Icon(Icons.Default.Settings, "Settings")
-                    }
+                    IconButton(onClick = onImportClick) { Icon(Icons.Default.FileUpload, "Import") }
+                    IconButton(onClick = onSettingsClick) { Icon(Icons.Default.Settings, "Settings") }
                 }
             )
         },
         floatingActionButton = {
-            FloatingActionButton(
-                onClick = onAddTransaction,
-                containerColor = MaterialTheme.colorScheme.primary,
-                contentColor = Color.White,
-                shape = CircleShape,
-                modifier = Modifier.size(64.dp)
-            ) {
-                Icon(Icons.Default.Add, "Add Transaction", modifier = Modifier.size(32.dp))
+            FloatingActionButton(onClick = onAddTransaction, shape = CircleShape) {
+                Icon(Icons.Default.Add, "Add Transaction")
             }
-        },
-        containerColor = MaterialTheme.colorScheme.background
+        }
     ) { padding ->
         if (uiState.isLoading) {
-            Box(Modifier.fillMaxSize(), contentAlignment = Alignment.Center) {
-                CircularProgressIndicator()
-            }
+            Box(Modifier.fillMaxSize(), contentAlignment = Alignment.Center) { CircularProgressIndicator() }
             return@Scaffold
         }
 
         LazyColumn(
-            modifier = Modifier
-                .fillMaxSize()
-                .padding(padding),
+            modifier = Modifier.fillMaxSize().padding(padding),
             contentPadding = PaddingValues(bottom = 100.dp)
         ) {
-            // ─── Balance Overview Card ───────────────────────────────────
             item {
                 AnimatedVisibility(
                     visible = true,
@@ -120,36 +141,29 @@ fun DashboardScreen(
                 }
             }
 
-            // ─── Pending SMS Transactions Banner ─────────────────────────
-            if (uiState.pendingAutoDetected.isNotEmpty()) {
-                item {
-                    PendingTransactionsBanner(
-                        count = uiState.pendingAutoDetected.size,
-                        modifier = Modifier.padding(horizontal = 16.dp)
-                    )
-                }
-            }
-
-            // ─── Accounts Horizontal Scroll ──────────────────────────────
             item {
-                SectionHeader(title = "Accounts", onSeeAll = onAccountsClick)
-                LazyRow(
-                    contentPadding = PaddingValues(horizontal = 16.dp),
-                    horizontalArrangement = Arrangement.spacedBy(12.dp)
-                ) {
-                    items(uiState.accounts) { account ->
-                        AccountChip(
-                            name = account.name,
-                            balance = account.balance,
-                            color = Color(account.color),
-                            onClick = onAccountsClick
-                        )
-                    }
-                }
-                Spacer(Modifier.height(16.dp))
+                AccountsSection(
+                    accounts = uiState.accounts,
+                    selectedAccountIds = selectedAccountIds,
+                    onToggleAccount = { id ->
+                        selectedAccountIds = if (selectedAccountIds.contains(id)) {
+                            selectedAccountIds - id
+                        } else {
+                            selectedAccountIds + id
+                        }
+                    },
+                    onSelectAll = {
+                        selectedAccountIds = uiState.accounts.filter { it.isActive }.map { it.id }.toSet()
+                    },
+                    onOpenAccountsSettings = onAccountsClick,
+                    onOpenAccountDetail = {
+                        selectedAccountIds.singleOrNull()?.let(onAccountDetailClick)
+                    },
+                    onOpenRecords = { onRecordsClick(selectedAccountIds.toList()) }
+                )
+                Spacer(Modifier.height(8.dp))
             }
 
-            // ─── Chart Period Tabs ───────────────────────────────────────
             item {
                 SectionHeader(title = "Spending Overview", onSeeAll = null)
                 TabRow(
@@ -158,35 +172,20 @@ fun DashboardScreen(
                     containerColor = MaterialTheme.colorScheme.surfaceVariant
                 ) {
                     listOf("Daily", "Monthly", "Yearly").forEachIndexed { idx, label ->
-                        Tab(
-                            selected = selectedTab == idx,
-                            onClick = { selectedTab = idx },
-                            text = { Text(label) }
-                        )
+                        Tab(selected = selectedTab == idx, onClick = { selectedTab = idx }, text = { Text(label) })
                     }
                 }
                 Spacer(Modifier.height(8.dp))
-
-                // Simple spending bar chart
                 SpendingBarChart(
                     data = uiState.dailyExpenses,
-                    modifier = Modifier
-                        .fillMaxWidth()
-                        .height(180.dp)
-                        .padding(horizontal = 16.dp)
+                    modifier = Modifier.fillMaxWidth().height(180.dp).padding(horizontal = 16.dp)
                 )
                 Spacer(Modifier.height(16.dp))
             }
 
-            // ─── Recent Transactions ─────────────────────────────────────
-            item {
-                SectionHeader(title = "Recent Transactions", onSeeAll = null)
-            }
-
+            item { SectionHeader(title = "Recent Transactions", onSeeAll = null) }
             if (uiState.recentTransactions.isEmpty()) {
-                item {
-                    EmptyTransactionsPlaceholder(onAddTransaction)
-                }
+                item { EmptyTransactionsPlaceholder(onAddTransaction) }
             } else {
                 items(uiState.recentTransactions) { transaction ->
                     TransactionItem(
@@ -201,66 +200,60 @@ fun DashboardScreen(
 }
 
 @Composable
-fun BalanceOverviewCard(
-    totalBalance: Double,
-    monthlyIncome: Double,
-    monthlyExpense: Double,
-    modifier: Modifier = Modifier
+private fun AccountsSection(
+    accounts: List<AccountEntity>,
+    selectedAccountIds: Set<Long>,
+    onToggleAccount: (Long) -> Unit,
+    onSelectAll: () -> Unit,
+    onOpenAccountsSettings: () -> Unit,
+    onOpenAccountDetail: () -> Unit,
+    onOpenRecords: () -> Unit
 ) {
     Card(
-        modifier = modifier.fillMaxWidth(),
-        shape = RoundedCornerShape(24.dp),
-        colors = CardDefaults.cardColors(containerColor = Color.Transparent)
+        modifier = Modifier.padding(horizontal = 16.dp),
+        shape = RoundedCornerShape(16.dp)
     ) {
-        Box(
-            modifier = Modifier
-                .fillMaxWidth()
-                .background(
-                    Brush.linearGradient(
-                        colors = listOf(
-                            MaterialTheme.colorScheme.primary,
-                            MaterialTheme.colorScheme.secondary
-                        )
-                    ),
-                    shape = RoundedCornerShape(24.dp)
-                )
-                .padding(24.dp)
-        ) {
-            Column {
-                Text(
-                    "Total Balance",
-                    style = MaterialTheme.typography.bodyMedium,
-                    color = Color.White.copy(alpha = 0.8f)
-                )
-                Spacer(Modifier.height(4.dp))
-                Text(
-                    CurrencyFormatter.format(totalBalance),
-                    style = MaterialTheme.typography.headlineLarge.copy(fontWeight = FontWeight.Bold),
-                    color = Color.White
-                )
-                Spacer(Modifier.height(24.dp))
+        Column(Modifier.padding(12.dp)) {
+            Row(verticalAlignment = Alignment.CenterVertically) {
+                Text("List of accounts", style = MaterialTheme.typography.titleMedium, fontWeight = FontWeight.SemiBold)
+                Spacer(Modifier.weight(1f))
+                IconButton(onClick = onOpenAccountsSettings) {
+                    Icon(Icons.Default.Settings, contentDescription = "Account settings")
+                }
+            }
+            accounts.chunked(3).forEach { rowAccounts ->
                 Row(
                     modifier = Modifier.fillMaxWidth(),
-                    horizontalArrangement = Arrangement.SpaceBetween
+                    horizontalArrangement = Arrangement.spacedBy(8.dp)
                 ) {
-                    BalanceStat(
-                        label = "Income",
-                        amount = monthlyIncome,
-                        icon = Icons.Default.TrendingUp,
-                        color = Color(0xFFB2F0E8)
-                    )
-                    Divider(
-                        modifier = Modifier
-                            .height(40.dp)
-                            .width(1.dp),
-                        color = Color.White.copy(alpha = 0.3f)
-                    )
-                    BalanceStat(
-                        label = "Expense",
-                        amount = monthlyExpense,
-                        icon = Icons.Default.TrendingDown,
-                        color = Color(0xFFFFCDD2)
-                    )
+                    rowAccounts.forEach { account ->
+                        val selected = selectedAccountIds.contains(account.id)
+                        AccountGridItem(
+                            modifier = Modifier.weight(1f),
+                            account = account,
+                            selected = selected,
+                            onClick = { onToggleAccount(account.id) }
+                        )
+                    }
+                    repeat(3 - rowAccounts.size) { Spacer(Modifier.weight(1f)) }
+                }
+                Spacer(Modifier.height(8.dp))
+            }
+            TextButton(onClick = onSelectAll, modifier = Modifier.align(Alignment.CenterHorizontally)) {
+                Text("Select all non-excluded")
+            }
+
+            if (selectedAccountIds.isNotEmpty()) {
+                Row(
+                    modifier = Modifier.fillMaxWidth().padding(top = 8.dp),
+                    horizontalArrangement = Arrangement.spacedBy(12.dp)
+                ) {
+                    FilledTonalButton(
+                        modifier = Modifier.weight(1f),
+                        onClick = onOpenAccountDetail,
+                        enabled = selectedAccountIds.size == 1
+                    ) { Text("ACCOUNT DETAIL") }
+                    FilledTonalButton(modifier = Modifier.weight(1f), onClick = onOpenRecords) { Text("RECORDS") }
                 }
             }
         }
@@ -268,124 +261,89 @@ fun BalanceOverviewCard(
 }
 
 @Composable
-private fun BalanceStat(
-    label: String,
-    amount: Double,
-    icon: androidx.compose.ui.graphics.vector.ImageVector,
-    color: Color
-) {
-    Row(verticalAlignment = Alignment.CenterVertically) {
-        Box(
-            modifier = Modifier
-                .size(36.dp)
-                .clip(CircleShape)
-                .background(color.copy(alpha = 0.3f)),
-            contentAlignment = Alignment.Center
-        ) {
-            Icon(icon, null, tint = color, modifier = Modifier.size(20.dp))
-        }
-        Spacer(Modifier.width(8.dp))
-        Column {
-            Text(label, color = Color.White.copy(alpha = 0.7f), fontSize = 12.sp)
-            Text(
-                CurrencyFormatter.formatCompact(amount),
-                color = Color.White,
-                fontWeight = FontWeight.SemiBold,
-                fontSize = 16.sp
-            )
-        }
-    }
-}
-
-@Composable
-fun AccountChip(
-    name: String,
-    balance: Double,
-    color: Color,
+private fun AccountGridItem(
+    modifier: Modifier,
+    account: AccountEntity,
+    selected: Boolean,
     onClick: () -> Unit
 ) {
     Card(
-        modifier = Modifier
-            .width(160.dp)
-            .clickable(onClick = onClick),
-        shape = RoundedCornerShape(16.dp),
-        colors = CardDefaults.cardColors(containerColor = color.copy(alpha = 0.1f))
+        modifier = modifier.clickable(onClick = onClick),
+        shape = RoundedCornerShape(10.dp),
+        colors = CardDefaults.cardColors(
+            containerColor = if (selected) Color(account.color) else Color(0xFFB0B0B0)
+        )
     ) {
-        Column(modifier = Modifier.padding(16.dp)) {
-            Box(
-                modifier = Modifier
-                    .size(36.dp)
-                    .clip(CircleShape)
-                    .background(color.copy(alpha = 0.2f)),
-                contentAlignment = Alignment.Center
-            ) {
-                Icon(
-                    Icons.Default.AccountBalance,
-                    null,
-                    tint = color,
-                    modifier = Modifier.size(20.dp)
-                )
-            }
-            Spacer(Modifier.height(8.dp))
-            Text(name, style = MaterialTheme.typography.labelMedium, maxLines = 1)
+        Column(Modifier.padding(10.dp)) {
+            Text(account.name, maxLines = 1, color = Color.White, style = MaterialTheme.typography.bodySmall)
             Text(
-                CurrencyFormatter.format(balance),
-                style = MaterialTheme.typography.titleMedium,
-                fontWeight = FontWeight.Bold,
-                color = color
+                CurrencyFormatter.format(account.balance),
+                color = Color.White,
+                fontWeight = FontWeight.Bold
             )
         }
     }
 }
 
 @Composable
-fun SpendingBarChart(
-    data: List<Pair<String, Double>>,
-    modifier: Modifier = Modifier
-) {
+fun BalanceOverviewCard(totalBalance: Double, monthlyIncome: Double, monthlyExpense: Double, modifier: Modifier = Modifier) {
+    Card(modifier = modifier.fillMaxWidth(), shape = RoundedCornerShape(24.dp), colors = CardDefaults.cardColors(containerColor = Color.Transparent)) {
+        Box(
+            modifier = Modifier.fillMaxWidth().background(
+                Brush.linearGradient(listOf(MaterialTheme.colorScheme.primary, MaterialTheme.colorScheme.secondary)),
+                shape = RoundedCornerShape(24.dp)
+            ).padding(24.dp)
+        ) {
+            Column {
+                Text("Total Balance", style = MaterialTheme.typography.bodyMedium, color = Color.White.copy(alpha = 0.8f))
+                Spacer(Modifier.height(4.dp))
+                Text(CurrencyFormatter.format(totalBalance), style = MaterialTheme.typography.headlineLarge.copy(fontWeight = FontWeight.Bold), color = Color.White)
+                Spacer(Modifier.height(24.dp))
+                Row(modifier = Modifier.fillMaxWidth(), horizontalArrangement = Arrangement.SpaceBetween) {
+                    BalanceStat("Income", monthlyIncome, Color(0xFFB2F0E8))
+                    Divider(modifier = Modifier.height(40.dp).width(1.dp), color = Color.White.copy(alpha = 0.3f))
+                    BalanceStat("Expense", monthlyExpense, Color(0xFFFFCDD2))
+                }
+            }
+        }
+    }
+}
+
+@Composable
+private fun BalanceStat(label: String, amount: Double, color: Color) {
+    Row(verticalAlignment = Alignment.CenterVertically) {
+        Box(modifier = Modifier.size(36.dp).clip(CircleShape).background(color.copy(alpha = 0.3f)))
+        Spacer(Modifier.width(8.dp))
+        Column {
+            Text(label, color = Color.White.copy(alpha = 0.7f), fontSize = 12.sp)
+            Text(CurrencyFormatter.formatCompact(amount), color = Color.White, fontWeight = FontWeight.SemiBold, fontSize = 16.sp)
+        }
+    }
+}
+
+@Composable
+fun SpendingBarChart(data: List<Pair<String, Double>>, modifier: Modifier = Modifier) {
     if (data.isEmpty()) {
         Card(modifier = modifier, colors = CardDefaults.cardColors(containerColor = MaterialTheme.colorScheme.surfaceVariant)) {
-            Box(Modifier.fillMaxSize(), contentAlignment = Alignment.Center) {
-                Text("No spending data this period", style = MaterialTheme.typography.bodyMedium)
-            }
+            Box(Modifier.fillMaxSize(), contentAlignment = Alignment.Center) { Text("No spending data this period") }
         }
         return
     }
-
     val maxValue = data.maxOf { it.second }
-
-    Card(
-        modifier = modifier,
-        colors = CardDefaults.cardColors(containerColor = MaterialTheme.colorScheme.surface),
-        elevation = CardDefaults.cardElevation(2.dp)
-    ) {
+    Card(modifier = modifier, elevation = CardDefaults.cardElevation(2.dp)) {
         Row(
-            modifier = Modifier
-                .fillMaxSize()
-                .padding(12.dp),
+            modifier = Modifier.fillMaxSize().padding(12.dp),
             horizontalArrangement = Arrangement.SpaceEvenly,
             verticalAlignment = Alignment.Bottom
         ) {
             data.takeLast(14).forEach { (date, amount) ->
-                Column(
-                    horizontalAlignment = Alignment.CenterHorizontally,
-                    verticalArrangement = Arrangement.Bottom,
-                    modifier = Modifier.weight(1f).fillMaxHeight()
-                ) {
+                Column(horizontalAlignment = Alignment.CenterHorizontally, verticalArrangement = Arrangement.Bottom, modifier = Modifier.weight(1f).fillMaxSize()) {
                     val fraction = if (maxValue > 0) (amount / maxValue).toFloat() else 0f
                     Box(
-                        modifier = Modifier
-                            .fillMaxWidth(0.6f)
-                            .fillMaxHeight(fraction.coerceIn(0.05f, 1f))
-                            .clip(RoundedCornerShape(topStart = 4.dp, topEnd = 4.dp))
-                            .background(MaterialTheme.colorScheme.primary)
+                        modifier = Modifier.fillMaxWidth(0.6f).weight(fraction.coerceIn(0.05f, 1f)).clip(RoundedCornerShape(topStart = 4.dp, topEnd = 4.dp)).background(MaterialTheme.colorScheme.primary)
                     )
                     Spacer(Modifier.height(4.dp))
-                    Text(
-                        text = date.takeLast(2),
-                        fontSize = 9.sp,
-                        color = MaterialTheme.colorScheme.onSurfaceVariant
-                    )
+                    Text(text = date.takeLast(2), fontSize = 9.sp, color = MaterialTheme.colorScheme.onSurfaceVariant)
                 }
             }
         }
@@ -395,65 +353,28 @@ fun SpendingBarChart(
 @Composable
 fun SectionHeader(title: String, onSeeAll: (() -> Unit)?) {
     Row(
-        modifier = Modifier
-            .fillMaxWidth()
-            .padding(horizontal = 16.dp, vertical = 8.dp),
+        modifier = Modifier.fillMaxWidth().padding(horizontal = 16.dp, vertical = 8.dp),
         horizontalArrangement = Arrangement.SpaceBetween,
         verticalAlignment = Alignment.CenterVertically
     ) {
         Text(title, style = MaterialTheme.typography.titleMedium, fontWeight = FontWeight.SemiBold)
         if (onSeeAll != null) {
-            TextButton(onClick = onSeeAll) {
-                Text("See All", style = MaterialTheme.typography.labelMedium)
-            }
+            TextButton(onClick = onSeeAll) { Text("See All") }
         }
     }
-}
-
-@Composable
-fun PendingTransactionsBanner(count: Int, modifier: Modifier = Modifier) {
-    Card(
-        modifier = modifier.fillMaxWidth(),
-        colors = CardDefaults.cardColors(containerColor = MaterialTheme.colorScheme.tertiaryContainer),
-        shape = RoundedCornerShape(12.dp)
-    ) {
-        Row(
-            modifier = Modifier.padding(12.dp),
-            verticalAlignment = Alignment.CenterVertically
-        ) {
-            Icon(Icons.Default.Sms, null, tint = MaterialTheme.colorScheme.tertiary)
-            Spacer(Modifier.width(8.dp))
-            Text(
-                "$count transaction(s) detected from SMS. Tap to review.",
-                style = MaterialTheme.typography.bodySmall
-            )
-        }
-    }
-    Spacer(Modifier.height(8.dp))
 }
 
 @Composable
 fun EmptyTransactionsPlaceholder(onAdd: () -> Unit) {
     Column(
-        modifier = Modifier
-            .fillMaxWidth()
-            .padding(48.dp),
+        modifier = Modifier.fillMaxWidth().padding(48.dp),
         horizontalAlignment = Alignment.CenterHorizontally
     ) {
-        Icon(
-            Icons.Outlined.ReceiptLong,
-            null,
-            modifier = Modifier.size(64.dp),
-            tint = MaterialTheme.colorScheme.onSurfaceVariant.copy(alpha = 0.5f)
-        )
+        Icon(Icons.Outlined.ReceiptLong, null, modifier = Modifier.size(64.dp), tint = MaterialTheme.colorScheme.onSurfaceVariant.copy(alpha = 0.5f))
         Spacer(Modifier.height(16.dp))
         Text("No transactions yet", style = MaterialTheme.typography.titleMedium)
         Spacer(Modifier.height(8.dp))
-        Text(
-            "Add your first transaction or import from a file.",
-            style = MaterialTheme.typography.bodyMedium,
-            color = MaterialTheme.colorScheme.onSurfaceVariant
-        )
+        Text("Add your first transaction.", color = MaterialTheme.colorScheme.onSurfaceVariant)
         Spacer(Modifier.height(16.dp))
         FilledTonalButton(onClick = onAdd) {
             Icon(Icons.Default.Add, null)
