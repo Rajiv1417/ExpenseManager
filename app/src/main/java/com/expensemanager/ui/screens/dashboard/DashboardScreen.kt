@@ -80,7 +80,7 @@ fun DashboardScreen(
                     IconButton(onClick = onSettingsClick) {
                         Icon(Icons.Default.Settings, "Settings")
                     }
-                }
+                },
             if (showAccountActions && selectedAccountId != null) {
 
                 ModalBottomSheet(
@@ -204,7 +204,6 @@ fun DashboardScreen(
                                 selectedAccountId = account.id
                                 showAccountActions = true
                             }
-                        )
                         )
                     }
                 }
