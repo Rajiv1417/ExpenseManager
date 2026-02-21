@@ -24,6 +24,7 @@ import androidx.compose.ui.draw.clip
 import androidx.compose.ui.graphics.Brush
 import androidx.compose.ui.graphics.Color
 import androidx.compose.ui.text.font.FontWeight
+import androidx.compose.ui.text.style.TextAlign
 import androidx.compose.ui.unit.dp
 import androidx.compose.ui.unit.sp
 import androidx.hilt.navigation.compose.hiltViewModel
@@ -49,7 +50,6 @@ fun DashboardScreen(
 
     var selectedAccountId by remember { mutableStateOf<Long?>(null) }
     var showAccountActions by remember { mutableStateOf(false) }
-    var selectedTab by remember { mutableIntStateOf(0) }
 
     Scaffold(
         topBar = {
@@ -109,10 +109,50 @@ fun DashboardScreen(
 
     ) { padding ->
 
+        if (uiState.error != null) {
+            Box(
+                modifier = Modifier
+                    .fillMaxSize()
+                    .padding(padding),
+                contentAlignment = Alignment.Center
+            ) {
+                Column(
+                    horizontalAlignment = Alignment.CenterHorizontally,
+                    modifier = Modifier.padding(16.dp)
+                ) {
+                    Icon(
+                        Icons.Default.ErrorOutline,
+                        contentDescription = null,
+                        tint = MaterialTheme.colorScheme.error,
+                        modifier = Modifier.size(48.dp)
+                    )
+                    Spacer(Modifier.height(16.dp))
+                    Text(
+                        "Failed to load dashboard",
+                        style = MaterialTheme.typography.titleMedium,
+                        color = MaterialTheme.colorScheme.error
+                    )
+                    Spacer(Modifier.height(8.dp))
+                    Text(
+                        uiState.error ?: "Unknown error occurred",
+                        style = MaterialTheme.typography.bodySmall,
+                        textAlign = TextAlign.Center
+                    )
+                    Spacer(Modifier.height(16.dp))
+                    Button(onClick = { viewModel.dismissError() }) {
+                        Text("Dismiss")
+                    }
+                }
+            }
+            return@Scaffold
+        }
+
         if (uiState.isLoading) {
 
             Box(
-                modifier = Modifier.fillMaxSize(),
+                modifier = Modifier
+                    .fillMaxSize()
+                    .padding(padding),
                 contentAlignment = Alignment.Center
             ) {
                 CircularProgressIndicator()
@@ -158,12 +198,20 @@ fun DashboardScreen(
                     }
                 }
 
-                LazyRow(
-                    contentPadding = PaddingValues(horizontal = 16.dp),
-                    horizontalArrangement = Arrangement.spacedBy(12.dp)
-                ) {
+                if (uiState.accounts.isEmpty()) {
+                    Text(
+                        "No accounts yet. Create one to get started.",
+                        modifier = Modifier.padding(16.dp),
+                        style = MaterialTheme.typography.bodyMedium,
+                        color = MaterialTheme.colorScheme.onSurfaceVariant
+                    )
+                } else {
+                    LazyRow(
+                        contentPadding = PaddingValues(horizontal = 16.dp),
+                        horizontalArrangement = Arrangement.spacedBy(12.dp)
+                    ) {
 
-                    items(uiState.accounts) { account ->
+                        items(uiState.accounts, key = { it.id }) { account ->
 
                         AccountChip(
                             name = account.name,
@@ -177,29 +225,43 @@ fun DashboardScreen(
                             }
                         )
                     }
+                    }
                 }
 
                 Spacer(Modifier.height(16.dp))
             }
 
-            item {
+            if (uiState.recentTransactions.isEmpty()) {
+                item {
+                    Text(
+                        "No transactions yet",
+                        modifier = Modifier.padding(16.dp),
+                        style = MaterialTheme.typography.bodyMedium,
+                        color = MaterialTheme.colorScheme.onSurfaceVariant
+                    )
+                }
+            } else {
+                item {
+                    Text(
+                        "Recent Transactions",
+                        modifier = Modifier.padding(16.dp),
+                        style = MaterialTheme.typography.titleMedium
+                    )
+                }
 
-                Text(
-                    "Recent Transactions",
-                    modifier = Modifier.padding(16.dp),
-                    style = MaterialTheme.typography.titleMedium
-                )
-            }
+                items(uiState.recentTransactions, key = { it.id }) { transaction ->
 
-            items(uiState.recentTransactions) { transaction ->
-
-                TransactionItem(
-                    transaction = transaction,
-                    onClick = {
-                        onTransactionClick(transaction.id)
-                    },
-                    modifier = Modifier.padding(horizontal = 16.dp)
-                )
+                    TransactionItem(
+                        transaction = transaction,
+                        onClick = {
+                            onTransactionClick(transaction.id)
+                        },
+                        modifier = Modifier.padding(horizontal = 16.dp)
+                    )
+                }
+                item {
+                    Spacer(Modifier.height(80.dp))
+                }
             }
         }
     }
@@ -207,40 +269,42 @@ fun DashboardScreen(
     // Bottom sheet OUTSIDE Scaffold (correct placement)
 
     if (showAccountActions && selectedAccountId != null) {
+        val accountId = selectedAccountId
+        if (accountId != null) {
+            ModalBottomSheet(
+                onDismissRequest = {
+                    showAccountActions = false
+                }
+            ) {
 
-        ModalBottomSheet(
-            onDismissRequest = {
-                showAccountActions = false
+                ListItem(
+                    headlineContent = { Text("Account Details") },
+                    leadingContent = {
+                        Icon(Icons.Default.AccountBalance, null)
+                    },
+                    modifier = Modifier.clickable {
+
+                        showAccountActions = false
+
+                        onAccountDetailsClick(accountId)
+                    }
+                )
+
+                ListItem(
+                    headlineContent = { Text("View Records") },
+                    leadingContent = {
+                        Icon(Icons.Default.ReceiptLong, null)
+                    },
+                    modifier = Modifier.clickable {
+
+                        showAccountActions = false
+
+                        onAccountRecordsClick(accountId)
+                    }
+                )
+
+                Spacer(Modifier.height(24.dp))
             }
-        ) {
-
-            ListItem(
-                headlineContent = { Text("Account Details") },
-                leadingContent = {
-                    Icon(Icons.Default.AccountBalance, null)
-                },
-                modifier = Modifier.clickable {
-
-                    showAccountActions = false
-
-                    onAccountDetailsClick(selectedAccountId!!)
-                }
-            )
-
-            ListItem(
-                headlineContent = { Text("View Records") },
-                leadingContent = {
-                    Icon(Icons.Default.ReceiptLong, null)
-                },
-                modifier = Modifier.clickable {
-
-                    showAccountActions = false
-
-                    onAccountRecordsClick(selectedAccountId!!)
-                }
-            )
-
-            Spacer(Modifier.height(24.dp))
         }
     }
 }
