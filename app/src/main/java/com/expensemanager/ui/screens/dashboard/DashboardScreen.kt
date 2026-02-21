@@ -40,12 +40,15 @@ import java.time.format.DateTimeFormatter
 fun DashboardScreen(
     onAddTransaction: () -> Unit,
     onTransactionClick: (Long) -> Unit,
-    onAccountsClick: () -> Unit,
+    onAccountDetailsClick: (Long) -> Unit,
+    onAccountRecordsClick: (Long) -> Unit,
     onImportClick: () -> Unit,
     onSettingsClick: () -> Unit,
     viewModel: DashboardViewModel = hiltViewModel()
 ) {
     val uiState by viewModel.uiState.collectAsState()
+    var selectedAccountId by remember { mutableStateOf<Long?>(null) }
+    var showAccountActions by remember { mutableStateOf(false) }
     var selectedTab by remember { mutableIntStateOf(0) }
 
     Scaffold(
@@ -77,6 +80,42 @@ fun DashboardScreen(
                         Icon(Icons.Default.Settings, "Settings")
                     }
                 }
+            if (showAccountActions && selectedAccountId != null) {
+
+                ModalBottomSheet(
+                    onDismissRequest = { showAccountActions = false }
+                ) {
+            
+                    ListItem(
+                        headlineContent = { Text("Account Details") },
+                        leadingContent = {
+                            Icon(Icons.Default.AccountBalance, null)
+                        },
+                        modifier = Modifier.clickable {
+            
+                            showAccountActions = false
+            
+                            onAccountDetailsClick(selectedAccountId!!)
+                        }
+                    )
+            
+                    ListItem(
+                        headlineContent = { Text("View Records") },
+                        leadingContent = {
+                            Icon(Icons.Default.ReceiptLong, null)
+                        },
+                        modifier = Modifier.clickable {
+            
+                            showAccountActions = false
+            
+                            // Navigate to filtered records screen
+                            onAccountRecordsClick(selectedAccountId!!)
+                        }
+                    )
+            
+                    Spacer(Modifier.height(32.dp))
+                }
+            }
             )
         },
         floatingActionButton = {
@@ -132,7 +171,24 @@ fun DashboardScreen(
 
             // ─── Accounts Horizontal Scroll ──────────────────────────────
             item {
-                SectionHeader(title = "Accounts", onSeeAll = onAccountsClick)
+                Row(
+                    modifier = Modifier
+                        .fillMaxWidth()
+                        .padding(horizontal = 16.dp),
+                    horizontalArrangement = Arrangement.SpaceBetween,
+                    verticalAlignment = Alignment.CenterVertically
+                ) {
+                
+                    Text(
+                        "Accounts",
+                        style = MaterialTheme.typography.titleMedium,
+                        fontWeight = FontWeight.SemiBold
+                    )
+                
+                    IconButton(onClick = onAccountsClick) {
+                        Icon(Icons.Default.Settings, "Manage Accounts")
+                    }
+                }
                 LazyRow(
                     contentPadding = PaddingValues(horizontal = 16.dp),
                     horizontalArrangement = Arrangement.spacedBy(12.dp)
@@ -142,7 +198,12 @@ fun DashboardScreen(
                             name = account.name,
                             balance = account.balance,
                             color = Color(account.color),
-                            onClick = onAccountsClick
+                            isSelected = selectedAccountId == account.id,
+                            onClick = {
+                                selectedAccountId = account.id
+                                showAccountActions = true
+                            }
+                        )
                         )
                     }
                 }
@@ -302,11 +363,17 @@ fun AccountChip(
     name: String,
     balance: Double,
     color: Color,
+    isSelected: Boolean,
     onClick: () -> Unit
 ) {
     Card(
         modifier = Modifier
             .width(160.dp)
+            .border(
+                width = if (isSelected) 2.dp else 0.dp,
+                color = MaterialTheme.colorScheme.primary,
+                shape = RoundedCornerShape(16.dp)
+            )
             .clickable(onClick = onClick),
         shape = RoundedCornerShape(16.dp),
         colors = CardDefaults.cardColors(containerColor = color.copy(alpha = 0.1f))
