@@ -1,6 +1,7 @@
 package com.expensemanager.ui.screens.accounts
 
 import androidx.compose.foundation.background
+import androidx.compose.foundation.clickable
 import androidx.compose.foundation.layout.Arrangement
 import androidx.compose.foundation.layout.Column
 import androidx.compose.foundation.layout.Row
@@ -37,6 +38,7 @@ import androidx.compose.runtime.mutableStateOf
 import androidx.compose.runtime.remember
 import androidx.compose.runtime.setValue
 import androidx.compose.ui.Alignment
+import androidx.compose.ui.draw.clip
 import androidx.compose.ui.Modifier
 import androidx.compose.ui.graphics.Color
 import androidx.compose.ui.unit.dp
@@ -159,22 +161,16 @@ fun AccountEditScreen(
 
 @Composable
 private fun ColorSwatch(color: Long, selected: Boolean, onClick: () -> Unit) {
-    androidx.compose.material3.Surface(
+    Row(
         modifier = Modifier
             .width(48.dp)
-            .height(32.dp),
-        shape = RoundedCornerShape(8.dp),
-        onClick = onClick,
-        tonalElevation = if (selected) 6.dp else 0.dp
+            .height(32.dp)
+            .background(Color(color), RoundedCornerShape(8.dp))
+                        .clip(RoundedCornerShape(8.dp))
+            .clickable(onClick = onClick),
+        horizontalArrangement = Arrangement.Center,
+        verticalAlignment = Alignment.CenterVertically
     ) {
-        Row(
-            modifier = Modifier
-                .fillMaxSize()
-                .background(Color(color)),
-            horizontalArrangement = Arrangement.Center,
-            verticalAlignment = Alignment.CenterVertically
-        ) {
-            if (selected) Text("✓", color = Color.White)
-        }
+        if (selected) Text("✓", color = Color.White)
     }
 }

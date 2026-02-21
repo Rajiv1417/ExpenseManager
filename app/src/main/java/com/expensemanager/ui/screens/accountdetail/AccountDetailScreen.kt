@@ -77,7 +77,7 @@ fun AccountDetailScreen(
             verticalArrangement = Arrangement.spacedBy(12.dp)
         ) {
             item {
-                Card(colors = CardDefaults.cardColors(containerColor = Color(uiState.account?.color ?: 0xFF4CAF50))) {
+                Card(colors = CardDefaults.cardColors(containerColor = Color(uiState.account?.color ?: 0xFF4CAF50L))) {
                     Column(modifier = Modifier.fillMaxWidth().padding(16.dp)) {
                         Text(uiState.account?.name ?: "", style = MaterialTheme.typography.headlineSmall, color = Color.White)
                         Text(uiState.account?.type?.name ?: "", color = Color.White.copy(alpha = 0.8f))
