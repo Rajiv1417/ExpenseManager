@@ -40,6 +40,7 @@ import java.time.format.DateTimeFormatter
 fun DashboardScreen(
     onAddTransaction: () -> Unit,
     onTransactionClick: (Long) -> Unit,
+    onAccountsClick: () -> Unit,
     onAccountDetailsClick: (Long) -> Unit,
     onAccountRecordsClick: (Long) -> Unit,
     onImportClick: () -> Unit,
