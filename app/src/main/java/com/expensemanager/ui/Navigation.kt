@@ -1,6 +1,7 @@
 package com.expensemanager.ui
 
 import androidx.compose.runtime.Composable
+import androidx.hilt.navigation.compose.hiltViewModel
 import androidx.navigation.NavHostController
 import androidx.navigation.NavType
 import androidx.navigation.compose.NavHost
@@ -66,7 +67,8 @@ fun AppNavGraph(navController: NavHostController) {
             val transactionId = backStack.arguments?.getLong("transactionId")?.takeIf { it != -1L }
             AddTransactionScreen(
                 transactionId = transactionId,
-                onBack = { navController.popBackStack() }
+                onBack = { navController.popBackStack() },
+                viewModel = hiltViewModel()
             )
         }
         composable(Routes.ACCOUNTS) {
