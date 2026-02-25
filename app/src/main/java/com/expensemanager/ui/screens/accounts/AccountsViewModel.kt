@@ -6,7 +6,11 @@ import com.expensemanager.data.local.entities.AccountEntity
 import com.expensemanager.data.local.entities.AccountType
 import com.expensemanager.data.repository.AccountRepository
 import dagger.hilt.android.lifecycle.HiltViewModel
-import kotlinx.coroutines.flow.*
+import kotlinx.coroutines.flow.MutableStateFlow
+import kotlinx.coroutines.flow.StateFlow
+import kotlinx.coroutines.flow.asStateFlow
+import kotlinx.coroutines.flow.combine
+import kotlinx.coroutines.flow.map
 import kotlinx.coroutines.launch
 import javax.inject.Inject
 
@@ -35,11 +39,47 @@ class AccountsViewModel @Inject constructor(
         }
     }
 
-    fun addAccount(name: String, type: AccountType, balance: Double) {
+    suspend fun getAccountById(id: Long): AccountEntity? = accountRepository.getAccountById(id)
+
+    fun saveAccount(
+        accountId: Long?,
+        name: String,
+        type: AccountType,
+        currency: String,
+        color: Long,
+        isActive: Boolean
+    ) {
         viewModelScope.launch {
-            accountRepository.insertAccount(
-                AccountEntity(name = name, type = type, balance = balance, initialBalance = balance)
-            )
+            val existing = accountId?.let { accountRepository.getAccountById(it) }
+            if (existing == null) {
+                accountRepository.insertAccount(
+                    AccountEntity(
+                        name = name,
+                        type = type,
+                        currency = currency,
+                        color = color,
+                        balance = 0.0,
+                        initialBalance = 0.0,
+                        isActive = isActive
+                    )
+                )
+            } else {
+                accountRepository.updateAccount(
+                    existing.copy(
+                        name = name,
+                        type = type,
+                        currency = currency,
+                        color = color,
+                        isActive = isActive
+                    )
+                )
+            }
+        }
+    }
+
+    fun deleteAccount(accountId: Long) {
+        viewModelScope.launch {
+            accountRepository.getAccountById(accountId)?.let { accountRepository.deleteAccount(it) }
         }
     }
 }
