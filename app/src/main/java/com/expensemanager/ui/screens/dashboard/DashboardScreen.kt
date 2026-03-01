@@ -294,7 +294,7 @@ fun DashboardScreen(
                 ListItem(
                     headlineContent = { Text("View Records") },
                     leadingContent = {
-                        Icon(Icons.Default.ReceiptLong, null)
+                        Icon(Icons.AutoMirrored.Filled.ReceiptLong, null)
                     },
                     modifier = Modifier.clickable {
 
