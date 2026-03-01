@@ -47,6 +47,12 @@ android {
             excludes += "mozilla/public-suffix-list.txt"
         }
     }
+    lint {
+        abortOnError = true       // fail on errors (default)
+        warningsAsErrors = false  // warnings stay as warnings
+        checkReleaseBuilds = false
+    }
+
     testOptions {
         unitTests {
             isReturnDefaultValues = true

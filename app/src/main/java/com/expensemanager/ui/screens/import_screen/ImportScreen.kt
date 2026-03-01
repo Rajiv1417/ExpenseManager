@@ -9,7 +9,9 @@ import androidx.compose.foundation.lazy.items
 import androidx.compose.foundation.shape.RoundedCornerShape
 import androidx.compose.material.icons.Icons
 import androidx.compose.material.icons.filled.*
+import androidx.compose.material.icons.automirrored.filled.ArrowBack
 import androidx.compose.material3.*
+import androidx.compose.material3.MenuAnchorType
 import androidx.compose.runtime.*
 import androidx.compose.ui.Alignment
 import androidx.compose.ui.Modifier
@@ -39,7 +41,7 @@ fun ImportScreen(
                 title = { Text("Import Transactions") },
                 navigationIcon = {
                     IconButton(onClick = onBack) {
-                        Icon(Icons.Default.ArrowBack, "Back")
+                        Icon(Icons.AutoMirrored.Filled.ArrowBack, "Back")
                     }
                 }
             )
@@ -118,7 +120,7 @@ fun ImportScreen(
             // ─── Preview & Import ───────────────────────────────────────
             if (uiState.previewTransactions.isNotEmpty()) {
                 item {
-                    Divider()
+                    HorizontalDivider()
                     Text(
                         "Preview (${uiState.previewTransactions.size} rows found)",
                         style = MaterialTheme.typography.titleSmall
@@ -238,7 +240,7 @@ fun ColumnMappingRow(
                 onValueChange = {},
                 readOnly = true,
                 trailingIcon = { ExposedDropdownMenuDefaults.TrailingIcon(expanded = expanded) },
-                modifier = Modifier.fillMaxWidth().menuAnchor(),
+                modifier = Modifier.fillMaxWidth().menuAnchor(MenuAnchorType.PrimaryNotEditable),
                 textStyle = MaterialTheme.typography.bodySmall,
                 shape = RoundedCornerShape(8.dp)
             )

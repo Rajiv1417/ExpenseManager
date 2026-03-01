@@ -7,6 +7,7 @@ import androidx.compose.foundation.shape.CircleShape
 import androidx.compose.foundation.shape.RoundedCornerShape
 import androidx.compose.material.icons.Icons
 import androidx.compose.material.icons.filled.*
+import androidx.compose.material.icons.automirrored.filled.CompareArrows
 import androidx.compose.material3.*
 import androidx.compose.runtime.Composable
 import androidx.compose.ui.Alignment
@@ -145,7 +146,7 @@ fun TransactionItem(
 
             // Refund/Cashback linked badge — like the screenshot
             if (transaction.linkedRefundTransactionId != null && transaction.refundAmount != null) {
-                Divider(modifier = Modifier.padding(horizontal = 16.dp))
+                HorizontalDivider(modifier = Modifier.padding(horizontal = 16.dp))
                 Row(
                     modifier = Modifier
                         .fillMaxWidth()
@@ -211,5 +212,5 @@ private fun TransactionEntity.typeColor(): Color = when (type) {
 private fun TransactionEntity.typeIcon() = when (type) {
     TransactionType.EXPENSE -> Icons.Default.ArrowUpward
     TransactionType.INCOME -> Icons.Default.ArrowDownward
-    TransactionType.TRANSFER -> Icons.Default.CompareArrows
+    TransactionType.TRANSFER -> Icons.AutoMirrored.Filled.CompareArrows
 }
