@@ -46,16 +46,6 @@ class TransactionRepository @Inject constructor(
     suspend fun insertTransaction(transaction: TransactionEntity): Long {
         val id = transactionDao.insertTransaction(transaction)
         // Update account balance
-        when (transaction.type) {
-            TransactionType.EXPENSE -> accountDao.decrementBalance(transaction.accountId, transaction.amount)
-            TransactionType.INCOME -> accountDao.incrementBalance(transaction.accountId, transaction.amount)
-            TransactionType.TRANSFER -> {
-                accountDao.decrementBalance(transaction.accountId, transaction.amount)
-                transaction.toAccountId?.let {
-                    accountDao.incrementBalance(it, transaction.amount)
-                }
-            }
-        }
         return id
     }
 
