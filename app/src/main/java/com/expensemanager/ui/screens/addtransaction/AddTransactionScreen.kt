@@ -338,9 +338,9 @@ fun FormField(label: String, content: @Composable ColumnScope.() -> Unit) {
 @OptIn(ExperimentalMaterial3Api::class)
 @Composable
 fun AccountDropdown(
-    accounts: List<com.expensemanager.data.local.entities.AccountEntity>,
-    selected: com.expensemanager.data.local.entities.AccountEntity?,
-    onSelected: (com.expensemanager.data.local.entities.AccountEntity) -> Unit
+    accounts: List<com.expensemanager.data.local.entities.AccountWithBalance>,
+    selected: com.expensemanager.data.local.entities.AccountWithBalance?,
+    onSelected: (com.expensemanager.data.local.entities.AccountWithBalance) -> Unit
 ) {
     var expanded by remember { mutableStateOf(false) }
     ExposedDropdownMenuBox(expanded = expanded, onExpandedChange = { expanded = it }) {
@@ -490,10 +490,10 @@ fun LabelsInput(
 @OptIn(ExperimentalMaterial3Api::class)
 @Composable
 fun RefundBottomSheet(
-    accounts: List<com.expensemanager.data.local.entities.AccountEntity>,
+    accounts: List<com.expensemanager.data.local.entities.AccountWithBalance>,
     refundAmount: String,
     onAmountChange: (String) -> Unit,
-    onAccountSelected: (com.expensemanager.data.local.entities.AccountEntity) -> Unit,
+    onAccountSelected: (com.expensemanager.data.local.entities.AccountWithBalance) -> Unit,
     onSave: () -> Unit,
     onDismiss: () -> Unit
 ) {
