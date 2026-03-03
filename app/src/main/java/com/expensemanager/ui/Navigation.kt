@@ -32,6 +32,14 @@ object Routes {
     const val ACCOUNT_RECORDS =
         "account_records/{accountId}"
 
+    const val ADD_ACCOUNT = "add_account"
+
+    const val EDIT_ACCOUNT = "edit_account/{accountId}"
+
+    fun editAccount(accountId: Long): String {
+        return "edit_account/$accountId"
+
+
     fun addTransaction(transactionId: Long? = null) =
         "add_transaction?transactionId=${transactionId ?: -1}"
 
