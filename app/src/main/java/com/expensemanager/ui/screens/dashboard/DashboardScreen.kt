@@ -52,7 +52,7 @@ import androidx.compose.ui.text.font.FontWeight
 import androidx.compose.ui.text.style.TextOverflow
 import androidx.compose.ui.unit.dp
 import androidx.hilt.navigation.compose.hiltViewModel
-import com.expensemanager.data.local.entities.AccountEntity
+import com.expensemanager.data.local.entities.AccountWithBalance
 import com.expensemanager.utils.CurrencyFormatter
 
 private val PrimaryMint = Color(0xFF3DDAAE)
@@ -280,7 +280,7 @@ private fun SummaryPill(label: String, value: String, dotColor: Color) {
 
 @Composable
 private fun DashboardAccountCard(
-    account: AccountEntity,
+    account: AccountWithBalance,
     onClick: () -> Unit,
     onLongInfo: () -> Unit
 ) {
@@ -364,7 +364,7 @@ private fun DashboardAccountCard(
     }
 }
 
-private fun accountVisuals(account: AccountEntity): Triple<Color, Color, androidx.compose.ui.graphics.vector.ImageVector> {
+private fun accountVisuals(account: AccountWithBalance): Triple<Color, Color, androidx.compose.ui.graphics.vector.ImageVector> {
     return when {
         account.balance < 0 -> Triple(Color(0xFF1A2C38), Color(0xFF2C3E50), Icons.Default.CreditCard)
         account.type.name.contains("SAV", ignoreCase = true) -> Triple(Color(0xFFFF712B), Color(0xFFFF4B6E), Icons.Default.Savings)
