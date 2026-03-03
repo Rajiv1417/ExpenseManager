@@ -18,13 +18,3 @@ data class AccountEntity(
     val color: Long,
     val createdAt: Long = System.currentTimeMillis()
 )
-enum class AccountType {
-    CASH,
-    BANK,
-    CREDIT_CARD,
-    SAVINGS,
-    WALLET,
-    INVESTMENT,
-    LOAN,
-    OTHER
-}
