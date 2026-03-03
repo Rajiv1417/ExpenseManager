@@ -45,7 +45,7 @@ class TransactionRepository @Inject constructor(
 
     suspend fun insertTransaction(transaction: TransactionEntity): Long {
         val id = transactionDao.insertTransaction(transaction)
-        // Update account balance
+        
         return id
     }
 
