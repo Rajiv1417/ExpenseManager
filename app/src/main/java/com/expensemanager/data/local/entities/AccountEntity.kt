@@ -15,8 +15,6 @@ data class AccountEntity(
     val color: Long,
     val createdAt: Long = System.currentTimeMillis()
 )
-package com.expensemanager.data.local.entities
-
 enum class AccountType {
     CASH,
     BANK,
