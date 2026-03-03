@@ -62,42 +62,6 @@ class TransactionRepository @Inject constructor(
     suspend fun insertTransactions(transactions: List<TransactionEntity>) {
         transactions.forEach { insertTransaction(it) }
     }
-
-    suspend fun updateTransaction(old: TransactionEntity, new: TransactionEntity) {
-        // Reverse old balance effect
-        when (old.type) {
-            TransactionType.EXPENSE -> accountDao.incrementBalance(old.accountId, old.amount)
-            TransactionType.INCOME -> accountDao.decrementBalance(old.accountId, old.amount)
-            TransactionType.TRANSFER -> {
-                accountDao.incrementBalance(old.accountId, old.amount)
-                old.toAccountId?.let { accountDao.decrementBalance(it, old.amount) }
-            }
-        }
-        // Apply new balance effect
-        when (new.type) {
-            TransactionType.EXPENSE -> accountDao.decrementBalance(new.accountId, new.amount)
-            TransactionType.INCOME -> accountDao.incrementBalance(new.accountId, new.amount)
-            TransactionType.TRANSFER -> {
-                accountDao.decrementBalance(new.accountId, new.amount)
-                new.toAccountId?.let { accountDao.incrementBalance(it, new.amount) }
-            }
-        }
-        transactionDao.updateTransaction(new)
-    }
-
-    suspend fun deleteTransaction(transaction: TransactionEntity) {
-        // Reverse balance effect
-        when (transaction.type) {
-            TransactionType.EXPENSE -> accountDao.incrementBalance(transaction.accountId, transaction.amount)
-            TransactionType.INCOME -> accountDao.decrementBalance(transaction.accountId, transaction.amount)
-            TransactionType.TRANSFER -> {
-                accountDao.incrementBalance(transaction.accountId, transaction.amount)
-                transaction.toAccountId?.let { accountDao.decrementBalance(it, transaction.amount) }
-            }
-        }
-        transactionDao.deleteTransaction(transaction)
-    }
-
     suspend fun getTransactionById(id: Long): TransactionEntity? = transactionDao.getTransactionById(id)
 
     fun getTotalIncome(from: LocalDateTime, to: LocalDateTime): Flow<Double?> =
