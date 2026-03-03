@@ -18,7 +18,7 @@ import androidx.compose.ui.graphics.Color
 import androidx.compose.ui.text.font.FontWeight
 import androidx.compose.ui.unit.dp
 import androidx.hilt.navigation.compose.hiltViewModel
-import com.expensemanager.data.local.entities.AccountEntity
+import com.expensemanager.data.local.entities.AccountWithBalance
 import com.expensemanager.utils.CurrencyFormatter
 
 @OptIn(ExperimentalMaterial3Api::class)
@@ -95,7 +95,7 @@ fun AccountsScreen(
 
 @Composable
 fun AccountCard(
-    account: AccountEntity,
+    account: AccountWithBalance,
     onAddTransaction: () -> Unit
 ) {
     Card(
