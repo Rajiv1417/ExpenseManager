@@ -45,8 +45,7 @@ data class AddTransactionUiState(
 class AddTransactionViewModel @Inject constructor(
     private val transactionRepository: TransactionRepository,
     private val accountRepository: AccountRepository,
-    private val categoryRepository: CategoryRepository,
-    private val linkRefundUseCase: LinkRefundUseCase
+    private val categoryRepository: CategoryRepository
 ) : ViewModel() {
 
     private val _uiState = MutableStateFlow(AddTransactionUiState())
