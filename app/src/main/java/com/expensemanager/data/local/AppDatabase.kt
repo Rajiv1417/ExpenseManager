@@ -6,7 +6,9 @@ import com.expensemanager.data.local.dao.AccountDao
 import com.expensemanager.data.local.entities.AccountEntity
 
 @Database(
-    entities = [AccountEntity::class],
+    entities = [AccountEntity::class,
+               TransactionEntity::class,
+               CategoryEntity::class],
     version = 1,
     exportSchema = false
 )
