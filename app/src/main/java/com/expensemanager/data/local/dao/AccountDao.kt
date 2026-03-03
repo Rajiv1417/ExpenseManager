@@ -16,6 +16,28 @@ interface AccountDao {
     @Delete
     suspend fun delete(account: AccountEntity)
 
-    @Query("SELECT * FROM accounts ORDER BY createdAt DESC")
-    fun getAll(): Flow<List<AccountEntity>>
+    @Query("""
+        SELECT a.id,
+               a.name,
+               a.accountNumber,
+               a.type,
+               a.initialValue,
+               a.currency,
+               a.color,
+               a.createdAt,
+               (a.initialValue + IFNULL(
+                    SUM(
+                        CASE
+                            WHEN t.type = 'INCOME' THEN t.amount
+                            WHEN t.type = 'EXPENSE' THEN -t.amount
+                            WHEN t.type = 'TRANSFER' THEN 0
+                        END
+                    ), 0
+               )) as balance
+        FROM accounts a
+        LEFT JOIN transactions t ON a.id = t.accountId
+        GROUP BY a.id
+        ORDER BY a.createdAt DESC
+    """)
+    fun getAccountsWithBalance(): Flow<List<AccountWithBalance>>
 }
