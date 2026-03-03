@@ -2,6 +2,9 @@ package com.expensemanager.data.local.entities
 
 import androidx.room.Entity
 import androidx.room.PrimaryKey
+import androidx.room.ForeignKey
+import androidx.room.Index
+import java.time.LocalDateTime
 
 @Entity(tableName = "accounts")
 data class AccountEntity(
