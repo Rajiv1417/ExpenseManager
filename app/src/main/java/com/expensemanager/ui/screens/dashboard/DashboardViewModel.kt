@@ -3,7 +3,6 @@ package com.expensemanager.ui.screens.dashboard
 import androidx.lifecycle.ViewModel
 import androidx.lifecycle.viewModelScope
 import com.expensemanager.data.local.entities.TransactionEntity
-import com.expensemanager.data.local.entities.AccountEntity
 import com.expensemanager.data.repository.AccountRepository
 import com.expensemanager.data.repository.TransactionRepository
 import dagger.hilt.android.lifecycle.HiltViewModel
@@ -12,13 +11,14 @@ import kotlinx.coroutines.launch
 import java.time.LocalDateTime
 import java.time.temporal.TemporalAdjusters
 import javax.inject.Inject
+import com.expensemanager.data.local.entities.AccountWithBalance
 
 data class DashboardUiState(
     val totalBalance: Double = 0.0,
     val monthlyIncome: Double = 0.0,
     val monthlyExpense: Double = 0.0,
     val recentTransactions: List<TransactionEntity> = emptyList(),
-    val accounts: List<AccountEntity> = emptyList(),
+    val accounts: List<AccountWithBalance> = emptyList()
     val pendingAutoDetected: List<TransactionEntity> = emptyList(),
     val dailyExpenses: List<Pair<String, Double>> = emptyList(),
     val categoryExpenses: List<Pair<Long, Double>> = emptyList(),
@@ -46,23 +46,15 @@ class DashboardViewModel @Inject constructor(
 
         viewModelScope.launch {
             combine(
-                accountRepository.getTotalBalance().map { it ?: 0.0 },
                 transactionRepository.getTotalIncome(startOfMonth, endOfMonth).map { it ?: 0.0 },
                 transactionRepository.getTotalExpense(startOfMonth, endOfMonth).map { it ?: 0.0 },
                 transactionRepository.getRecentTransactions(15),
                 accountRepository.getAllAccounts(),
                 transactionRepository.getPendingAutoDetected()
-            ) { values ->
-                val totalBalance = values[0] as Double
-                val income = values[1] as Double
-                val expense = values[2] as Double
-                @Suppress("UNCHECKED_CAST")
-                val recent = values[3] as List<TransactionEntity>
-                @Suppress("UNCHECKED_CAST")
-                val accounts = values[4] as List<AccountEntity>
-                @Suppress("UNCHECKED_CAST")
-                val pending = values[5] as List<TransactionEntity>
-
+            ) { income, expense, recent, accounts, pending ->
+            
+                val totalBalance = accounts.sumOf { it.balance }
+            
                 DashboardUiState(
                     totalBalance = totalBalance,
                     monthlyIncome = income,
