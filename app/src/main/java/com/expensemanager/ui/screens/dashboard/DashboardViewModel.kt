@@ -18,7 +18,7 @@ data class DashboardUiState(
     val monthlyIncome: Double = 0.0,
     val monthlyExpense: Double = 0.0,
     val recentTransactions: List<TransactionEntity> = emptyList(),
-    val accounts: List<AccountWithBalance> = emptyList()
+    val accounts: List<AccountWithBalance> = emptyList(),
     val pendingAutoDetected: List<TransactionEntity> = emptyList(),
     val dailyExpenses: List<Pair<String, Double>> = emptyList(),
     val categoryExpenses: List<Pair<Long, Double>> = emptyList(),
