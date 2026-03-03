@@ -8,15 +8,10 @@ data class AccountEntity(
     @PrimaryKey(autoGenerate = true)
     val id: Long = 0,
     val name: String,
-    val balance: Double = 0.0,
-    val type: AccountType = AccountType.BANK,
-    val currency: String = "INR",
-    val color: Long = 0xFF6200EE,
-    val icon: String = "account_balance",
-    val isActive: Boolean = true,
-    val initialBalance: Double = 0.0
+    val accountNumber: String?,
+    val type: String,
+    val initialValue: Double,
+    val currency: String,
+    val color: Long,
+    val createdAt: Long = System.currentTimeMillis()
 )
-
-enum class AccountType {
-    BANK, CASH, WALLET, CREDIT_CARD, SAVINGS, INVESTMENT, OTHER
-}
