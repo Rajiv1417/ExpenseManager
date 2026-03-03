@@ -36,11 +36,14 @@ class Converters {
     @TypeConverter
     fun toPaymentStatus(value: String): PaymentStatus = PaymentStatus.valueOf(value)
 
-    @TypeConverter
-    fun fromAccountType(value: AccountType): String = value.name
+    // ---- AccountType ----
 
     @TypeConverter
-    fun toAccountType(value: String): AccountType = AccountType.valueOf(value)
+    fun fromAccountType(value: AccountType?): String? = value?.name
+    
+    @TypeConverter
+    fun toAccountType(value: String?): AccountType? =
+        value?.let { AccountType.valueOf(it) }
 
     @TypeConverter
     fun fromStringList(value: List<String>): String = value.joinToString("|")
