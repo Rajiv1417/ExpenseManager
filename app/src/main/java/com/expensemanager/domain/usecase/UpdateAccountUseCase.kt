@@ -1,1 +1,0 @@
-Kutch bhi
