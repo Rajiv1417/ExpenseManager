@@ -9,7 +9,7 @@ import com.expensemanager.data.local.dao.CategoryDao
 import com.expensemanager.data.local.entities.AccountEntity
 import com.expensemanager.data.local.entities.TransactionEntity
 import com.expensemanager.data.local.entities.CategoryEntity
-import com.expensemanager.data.local.converters.Converters
+import com.expensemanager.data.local.Converters
 
 @Database(
     entities = [
