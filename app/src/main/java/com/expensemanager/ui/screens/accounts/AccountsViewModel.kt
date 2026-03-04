@@ -27,20 +27,36 @@ class AccountsViewModel @Inject constructor(
     init {
         viewModelScope.launch {
             accountRepository.getAllAccounts()
-                .map { accounts ->
-                    AccountsUiState(
+                .collect { accounts ->
+
+                    val total = accounts.sumOf { it.balance }
+
+                    _uiState.value = AccountsUiState(
                         accounts = accounts,
-                        totalBalance = accounts.sumOf { it.balance },
+                        totalBalance = total,
                         isLoading = false
                     )
                 }
-                .collect { _uiState.value = it }
         }
     }
 
-    fun deleteAccount(account: AccountEntity) {
+    fun addAccount(
+        name: String,
+        type: AccountType,
+        balance: Double
+    ) {
         viewModelScope.launch {
-            accountRepository.deleteAccount(account)
+            accountRepository.insertAccount(
+                AccountEntity(
+                    name = name,
+                    accountNumber = null,
+                    type = type,
+                    initialValue = balance,
+                    currency = "INR",
+                    color = 0xFF4CAF50,
+                    createdAt = System.currentTimeMillis()
+                )
+            )
         }
     }
 }
