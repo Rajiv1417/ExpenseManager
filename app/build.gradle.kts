@@ -46,6 +46,15 @@ android {
             excludes += "/META-INF/DEPENDENCIES"
             excludes += "mozilla/public-suffix-list.txt"
         }
+    jniLibs {
+            // Keep symbols for third-party native libs that AGP cannot strip in this environment.
+            // This removes noisy "Unable to strip" warnings for these artifacts.
+            keepDebugSymbols += setOf(
+                "**/libandroidx.graphics.path.so",
+                "**/libdatastore_shared_counter.so",
+                "**/libmlkit_google_ocr_pipeline.so"
+            )
+        }
     }
     lint {
         abortOnError = true       // fail on errors (default)
