@@ -39,8 +39,8 @@ ON t.accountId = a.id OR t.toAccountId = a.id
 GROUP BY a.id
 ORDER BY a.createdAt DESC
 """)
+    fun getAccountsWithBalance(): Flow<List<AccountWithBalance>>
+
 @Query("SELECT * FROM accounts ORDER BY createdAt DESC")
     suspend fun getAllAccountsOnce(): List<AccountEntity>
-
-    fun getAccountsWithBalance(): Flow<List<AccountWithBalance>>
 }
