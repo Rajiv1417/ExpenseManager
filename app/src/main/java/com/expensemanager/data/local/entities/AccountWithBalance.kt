@@ -1,13 +1,9 @@
 package com.expensemanager.data.local.entities
 
+import androidx.room.Embedded
+
 data class AccountWithBalance(
-    val id: Long,
-    val name: String,
-    val accountNumber: String?,
-    val type: String,
-    val initialValue: Double,
-    val currency: String,
-    val color: Long,
-    val createdAt: Long,
+    @Embedded
+    val account: AccountEntity,
     val balance: Double
 )
