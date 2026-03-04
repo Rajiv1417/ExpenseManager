@@ -20,32 +20,24 @@ interface AccountDao {
     @Query("SELECT * FROM accounts WHERE id = :id")
     suspend fun getAccountById(id: Long): AccountEntity?
 
-    @Query("""
-        SELECT 
-            a.id,
-            a.name,
-            a.accountNumber,
-            a.type,
-            a.initialValue,
-            a.currency,
-            a.color,
-            a.createdAt,
-            (
-                a.initialValue + IFNULL(
-                    SUM(
-                        CASE
-                            WHEN t.type = 'INCOME' THEN t.amount
-                            WHEN t.type = 'EXPENSE' THEN -t.amount
-                            WHEN t.type = 'TRANSFER' THEN 0
-                        END
-                    ), 0
-                )
-            ) as balance
-        FROM accounts a
-        LEFT JOIN transactions t 
-            ON a.id = t.accountId
-        GROUP BY a.id
-        ORDER BY a.createdAt DESC
-    """)
-    fun getAccountsWithBalance(): Flow<List<AccountWithBalance>>
+     @Query("""
+SELECT 
+    a.*,
+    a.initialValue
+    + COALESCE(SUM(
+        CASE 
+            WHEN t.type = 'INCOME' AND t.accountId = a.id THEN t.amount
+            WHEN t.type = 'EXPENSE' AND t.accountId = a.id THEN -t.amount
+            WHEN t.type = 'TRANSFER' AND t.accountId = a.id THEN -t.amount
+            WHEN t.type = 'TRANSFER' AND t.toAccountId = a.id THEN t.amount
+            ELSE 0
+        END
+    ), 0) AS balance
+FROM accounts a
+LEFT JOIN transactions t
+ON t.accountId = a.id OR t.toAccountId = a.id
+GROUP BY a.id
+ORDER BY a.createdAt DESC
+""")
+fun getAccountsWithBalance(): Flow<List<AccountWithBalance>>
 }
