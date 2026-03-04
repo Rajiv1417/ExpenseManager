@@ -36,12 +36,15 @@ import androidx.compose.material.icons.filled.Replay
 import androidx.compose.material.icons.filled.Save
 import androidx.compose.material.icons.filled.Schedule
 import androidx.compose.material.icons.filled.Timer
+import androidx.compose.material3.AlertDialog
 import androidx.compose.material3.Button
 import androidx.compose.material3.ButtonDefaults
 import androidx.compose.material3.Card
 import androidx.compose.material3.CardDefaults
 import androidx.compose.material3.CircularProgressIndicator
+import androidx.compose.material3.DropdownMenuItem
 import androidx.compose.material3.ExperimentalMaterial3Api
+import androidx.compose.material3.ExposedDropdownMenu
 import androidx.compose.material3.ExposedDropdownMenuBox
 import androidx.compose.material3.ExposedDropdownMenuDefaults
 import androidx.compose.material3.FilterChip
@@ -54,6 +57,7 @@ import androidx.compose.material3.ModalBottomSheet
 import androidx.compose.material3.OutlinedTextField
 import androidx.compose.material3.Scaffold
 import androidx.compose.material3.Text
+import androidx.compose.material3.TextButton
 import androidx.compose.material3.TopAppBar
 import androidx.compose.runtime.Composable
 import androidx.compose.runtime.collectAsState
@@ -230,7 +234,7 @@ fun AddTransactionScreen(
 fun TypeSelector(selected: TransactionType, onSelected: (TransactionType) -> Unit, modifier: Modifier = Modifier) {
     Card(modifier = modifier.fillMaxWidth(), colors = CardDefaults.cardColors(containerColor = MaterialTheme.colorScheme.surfaceVariant), shape = RoundedCornerShape(16.dp)) {
         Row(modifier = Modifier.padding(8.dp), horizontalArrangement = Arrangement.spacedBy(8.dp)) {
-            TransactionType.values().forEach { type ->
+            for (type in TransactionType.values()) {
                 val isSelected = selected == type
                 val color = when (type) {
                     TransactionType.EXPENSE -> ExpenseColor
@@ -293,9 +297,9 @@ fun AccountDropdown(accounts: List<AccountWithBalance>, selected: AccountWithBal
             modifier = Modifier.fillMaxWidth().menuAnchor(MenuAnchorType.PrimaryNotEditable),
             shape = RoundedCornerShape(12.dp)
         )
-        androidx.compose.material3.ExposedDropdownMenu(expanded = expanded, onDismissRequest = { expanded = false }) {
+        ExposedDropdownMenu(expanded = expanded, onDismissRequest = { expanded = false }) {
             for (account in accounts) {
-                androidx.compose.material3.DropdownMenuItem(
+                DropdownMenuItem(
                     text = {
                         Row(verticalAlignment = Alignment.CenterVertically) {
                             Box(Modifier.size(12.dp).clip(CircleShape).background(Color(account.account.color)))
@@ -333,14 +337,14 @@ fun CategoryDropdown(
             modifier = Modifier.fillMaxWidth().menuAnchor(MenuAnchorType.PrimaryNotEditable),
             shape = RoundedCornerShape(12.dp)
         )
-        androidx.compose.material3.ExposedDropdownMenu(expanded = expanded, onDismissRequest = { expanded = false }) {
+        ExposedDropdownMenu(expanded = expanded, onDismissRequest = { expanded = false }) {
             for (category in categories) {
-                androidx.compose.material3.DropdownMenuItem(
+                DropdownMenuItem(
                     text = { Text(category.name) },
                     onClick = { onSelected(category); expanded = false }
                 )
             }
-            androidx.compose.material3.DropdownMenuItem(
+            DropdownMenuItem(
                 text = { Text("+ Add category") },
                 onClick = { expanded = false; showAddDialog = true }
             )
@@ -349,20 +353,20 @@ fun CategoryDropdown(
 
     if (showAddDialog) {
         var name by remember { mutableStateOf("") }
-        androidx.compose.material3.AlertDialog(
+        AlertDialog(
             onDismissRequest = { showAddDialog = false },
             title = { Text("Add Category") },
             text = {
                 OutlinedTextField(value = name, onValueChange = { name = it }, label = { Text("Category name") })
             },
             confirmButton = {
-                androidx.compose.material3.TextButton(onClick = {
+                TextButton(onClick = {
                     onAddCategory(name)
                     showAddDialog = false
                 }) { Text("Add") }
             },
             dismissButton = {
-                androidx.compose.material3.TextButton(onClick = { showAddDialog = false }) { Text("Cancel") }
+                TextButton(onClick = { showAddDialog = false }) { Text("Cancel") }
             }
         )
     }
