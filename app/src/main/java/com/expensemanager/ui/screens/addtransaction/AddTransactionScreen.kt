@@ -41,6 +41,7 @@ import androidx.compose.material3.ButtonDefaults
 import androidx.compose.material3.Card
 import androidx.compose.material3.CardDefaults
 import androidx.compose.material3.CircularProgressIndicator
+import androidx.compose.material3.ExperimentalMaterial3Api
 import androidx.compose.material3.ExposedDropdownMenuBox
 import androidx.compose.material3.ExposedDropdownMenuDefaults
 import androidx.compose.material3.FilterChip
@@ -81,6 +82,7 @@ import com.expensemanager.ui.theme.TransferColor
 import java.time.LocalDateTime
 import java.time.format.DateTimeFormatter
 
+@OptIn(ExperimentalMaterial3Api::class)
 @Composable
 fun AddTransactionScreen(
     transactionId: Long? = null,
@@ -170,7 +172,7 @@ fun AddTransactionScreen(
 
             FormField("Status") {
                 Row(horizontalArrangement = Arrangement.spacedBy(8.dp)) {
-                    PaymentStatus.values().forEach { s ->
+                    for (s in PaymentStatus.values()) {
                         FilterChip(selected = uiState.status == s, onClick = { viewModel.setStatus(s) }, label = { Text(s.name) })
                     }
                 }
@@ -278,6 +280,7 @@ fun FormField(label: String, content: @Composable ColumnScope.() -> Unit) {
     }
 }
 
+@OptIn(ExperimentalMaterial3Api::class)
 @Composable
 fun AccountDropdown(accounts: List<AccountWithBalance>, selected: AccountWithBalance?, onSelected: (AccountWithBalance) -> Unit) {
     var expanded by remember { mutableStateOf(false) }
@@ -291,7 +294,7 @@ fun AccountDropdown(accounts: List<AccountWithBalance>, selected: AccountWithBal
             shape = RoundedCornerShape(12.dp)
         )
         androidx.compose.material3.ExposedDropdownMenu(expanded = expanded, onDismissRequest = { expanded = false }) {
-            accounts.forEach { account ->
+            for (account in accounts) {
                 androidx.compose.material3.DropdownMenuItem(
                     text = {
                         Row(verticalAlignment = Alignment.CenterVertically) {
@@ -310,6 +313,7 @@ fun AccountDropdown(accounts: List<AccountWithBalance>, selected: AccountWithBal
     }
 }
 
+@OptIn(ExperimentalMaterial3Api::class)
 @Composable
 fun CategoryDropdown(
     categories: List<CategoryEntity>,
@@ -330,7 +334,7 @@ fun CategoryDropdown(
             shape = RoundedCornerShape(12.dp)
         )
         androidx.compose.material3.ExposedDropdownMenu(expanded = expanded, onDismissRequest = { expanded = false }) {
-            categories.forEach { category ->
+            for (category in categories) {
                 androidx.compose.material3.DropdownMenuItem(
                     text = { Text(category.name) },
                     onClick = { onSelected(category); expanded = false }

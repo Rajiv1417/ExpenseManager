@@ -26,6 +26,7 @@ import androidx.compose.material3.AlertDialog
 import androidx.compose.material3.Button
 import androidx.compose.material3.Card
 import androidx.compose.material3.CardDefaults
+import androidx.compose.material3.ExperimentalMaterial3Api
 import androidx.compose.material3.Icon
 import androidx.compose.material3.IconButton
 import androidx.compose.material3.MaterialTheme
@@ -53,6 +54,7 @@ import com.expensemanager.data.local.entities.AccountType
 import com.expensemanager.data.local.entities.AccountWithBalance
 import com.expensemanager.utils.CurrencyFormatter
 
+@OptIn(ExperimentalMaterial3Api::class)
 @Composable
 fun AccountsScreen(
     onBack: () -> Unit,
@@ -262,7 +264,7 @@ fun AccountDialog(
                     modifier = Modifier.fillMaxWidth()
                 )
                 Text("Account Type", style = MaterialTheme.typography.labelMedium)
-                AccountType.values().forEach { type ->
+                for (type in AccountType.values()) {
                     Row(verticalAlignment = Alignment.CenterVertically) {
                         RadioButton(selected = selectedType == type, onClick = { selectedType = type })
                         Text(type.name)
