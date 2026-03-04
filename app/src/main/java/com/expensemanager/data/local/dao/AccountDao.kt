@@ -19,7 +19,10 @@ interface AccountDao {
 
     @Query("SELECT * FROM accounts WHERE id = :id")
     suspend fun getAccountById(id: Long): AccountEntity?
-
+    
+    @Query("SELECT * FROM accounts ORDER BY createdAt DESC")
+    suspend fun getAllAccountsOnce(): List<AccountEntity>
+    
      @Query("""
 SELECT 
     a.*,
@@ -40,7 +43,4 @@ GROUP BY a.id
 ORDER BY a.createdAt DESC
 """)
     fun getAccountsWithBalance(): Flow<List<AccountWithBalance>>
-
-@Query("SELECT * FROM accounts ORDER BY createdAt DESC")
-    suspend fun getAllAccountsOnce(): List<AccountEntity>
 }
