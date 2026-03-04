@@ -44,7 +44,7 @@ import androidx.compose.material3.CardDefaults
 import androidx.compose.material3.CircularProgressIndicator
 import androidx.compose.material3.DropdownMenuItem
 import androidx.compose.material3.ExperimentalMaterial3Api
-import androidx.compose.material3.ExposedDropdownMenu
+import androidx.compose.material3.DropdownMenu
 import androidx.compose.material3.ExposedDropdownMenuBox
 import androidx.compose.material3.ExposedDropdownMenuDefaults
 import androidx.compose.material3.FilterChip
@@ -297,7 +297,7 @@ fun AccountDropdown(accounts: List<AccountWithBalance>, selected: AccountWithBal
             modifier = Modifier.fillMaxWidth().menuAnchor(MenuAnchorType.PrimaryNotEditable),
             shape = RoundedCornerShape(12.dp)
         )
-        ExposedDropdownMenu(expanded = expanded, onDismissRequest = { expanded = false }) {
+        DropdownMenu(expanded = expanded, onDismissRequest = { expanded = false }) {
             for (account in accounts) {
                 DropdownMenuItem(
                     text = {
@@ -337,7 +337,7 @@ fun CategoryDropdown(
             modifier = Modifier.fillMaxWidth().menuAnchor(MenuAnchorType.PrimaryNotEditable),
             shape = RoundedCornerShape(12.dp)
         )
-        ExposedDropdownMenu(expanded = expanded, onDismissRequest = { expanded = false }) {
+        DropdownMenu(expanded = expanded, onDismissRequest = { expanded = false }) {
             for (category in categories) {
                 DropdownMenuItem(
                     text = { Text(category.name) },
@@ -460,6 +460,7 @@ fun LabelsInput(labels: List<String>, onAdd: (String) -> Unit, onRemove: (String
     }
 }
 
+@OptIn(ExperimentalMaterial3Api::class)
 @Composable
 fun RefundBottomSheet(
     accounts: List<AccountWithBalance>,
