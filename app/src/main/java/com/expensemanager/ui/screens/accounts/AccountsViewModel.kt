@@ -7,7 +7,10 @@ import com.expensemanager.data.local.entities.AccountType
 import com.expensemanager.data.local.entities.AccountWithBalance
 import com.expensemanager.data.repository.AccountRepository
 import dagger.hilt.android.lifecycle.HiltViewModel
-import kotlinx.coroutines.flow.*
+import kotlinx.coroutines.flow.MutableStateFlow
+import kotlinx.coroutines.flow.StateFlow
+import kotlinx.coroutines.flow.asStateFlow
+import kotlinx.coroutines.flow.collect
 import kotlinx.coroutines.launch
 import javax.inject.Inject
 
@@ -24,7 +27,7 @@ class AccountsViewModel @Inject constructor(
 
     private val _uiState = MutableStateFlow(AccountsUiState())
     val uiState: StateFlow<AccountsUiState> = _uiState.asStateFlow()
-    
+
     private val accountColors = listOf(
         0xFF43A047,
         0xFF1A6EDD,
@@ -53,7 +56,7 @@ class AccountsViewModel @Inject constructor(
         type: AccountType,
         balance: Double,
         color: Long,
-        symbol: String
+        symbol: String?
     ) {
         viewModelScope.launch {
             accountRepository.insertAccount(
