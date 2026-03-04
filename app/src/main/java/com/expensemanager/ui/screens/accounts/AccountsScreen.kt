@@ -89,7 +89,6 @@ fun AccountsScreen(
             verticalArrangement = Arrangement.spacedBy(12.dp)
         ) {
             item {
-                // Total Balance Card
                 Card(
                     modifier = Modifier.fillMaxWidth(),
                     colors = CardDefaults.cardColors(containerColor = MaterialTheme.colorScheme.primaryContainer),
@@ -129,6 +128,7 @@ fun AccountsScreen(
             onDismiss = { showAddAccountDialog = false }
         )
     }
+
     editingAccount?.let { account ->
         AccountDialog(
             title = "Edit Account",
