@@ -242,7 +242,7 @@ fun AddTransactionScreen(
             accounts = uiState.accounts,
             refundAmount = uiState.refundAmount,
             onAmountChange = { viewModel.setRefundAmount(it) },
-            onAccountSelected = { viewModel.setRefundAccount(it.id) },
+            onAccountSelected = { viewModel.setRefundAccount(it.account.id) },
             onSave = { viewModel.saveRefund(uiState.editingTransactionId!!) },
             onDismiss = { viewModel.showRefundSheet(false) }
         )
@@ -345,7 +345,7 @@ fun AccountDropdown(
     var expanded by remember { mutableStateOf(false) }
     ExposedDropdownMenuBox(expanded = expanded, onExpandedChange = { expanded = it }) {
         OutlinedTextField(
-            value = selected?.name ?: "Select Account",
+            value = selected?.account?.name ?: "Select Account",
             onValueChange = {},
             readOnly = true,
             trailingIcon = { ExposedDropdownMenuDefaults.TrailingIcon(expanded = expanded) },
@@ -359,11 +359,11 @@ fun AccountDropdown(
                         Row(verticalAlignment = Alignment.CenterVertically) {
                             Box(
                                 Modifier.size(12.dp).clip(CircleShape)
-                                    .background(Color(account.color))
+                                    .background(Color(account.account.color))
                             )
                             Spacer(Modifier.width(8.dp))
                             Column {
-                                Text(account.name)
+                                Text(account.account.name)
                                 Text("₹${account.balance}", style = MaterialTheme.typography.bodySmall)
                             }
                         }
