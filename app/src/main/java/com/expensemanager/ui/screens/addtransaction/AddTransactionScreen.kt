@@ -86,7 +86,8 @@ import com.expensemanager.ui.theme.TransferColor
 import java.time.LocalDateTime
 import java.time.format.DateTimeFormatter
 
-@OptIn(ExperimentalMaterial3Api::class)
+@file:OptIn(ExperimentalMaterial3Api::class)
+
 @Composable
 fun AddTransactionScreen(
     transactionId: Long? = null,
