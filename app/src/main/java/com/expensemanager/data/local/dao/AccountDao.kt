@@ -29,10 +29,10 @@ SELECT
     a.initialValue
     + COALESCE(SUM(
         CASE 
-            WHEN t.type = 'INCOME' AND t.accountId = a.id THEN t.amount
-            WHEN t.type = 'EXPENSE' AND t.accountId = a.id THEN -t.amount
-            WHEN t.type = 'TRANSFER' AND t.accountId = a.id THEN -t.amount
-            WHEN t.type = 'TRANSFER' AND t.toAccountId = a.id THEN t.amount
+            WHEN t.status IN ('CLEARED', 'RECONCILED') AND t.type = 'INCOME' AND t.accountId = a.id THEN t.amount
+            WHEN t.status IN ('CLEARED', 'RECONCILED') AND t.type = 'EXPENSE' AND t.accountId = a.id THEN -t.amount
+            WHEN t.status IN ('CLEARED', 'RECONCILED') AND t.type = 'TRANSFER' AND t.accountId = a.id THEN -t.amount
+            WHEN t.status IN ('CLEARED', 'RECONCILED') AND t.type = 'TRANSFER' AND t.toAccountId = a.id THEN t.amount
             ELSE 0
         END
     ), 0) AS balance
