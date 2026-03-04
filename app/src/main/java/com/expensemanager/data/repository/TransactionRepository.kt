@@ -46,7 +46,6 @@ class TransactionRepository @Inject constructor(
     suspend fun insertTransaction(transaction: TransactionEntity): Long {
         val id = transactionDao.insertTransaction(transaction)
         
-        return id
     }
 
     suspend fun insertTransactions(transactions: List<TransactionEntity>) {
