@@ -76,7 +76,7 @@ fun AccountsScreen(
             items(uiState.accounts) { account ->
                 AccountCard(
                     account = account,
-                    onAddTransaction = { onAddTransaction(account.id) }
+                    onAddTransaction = { onAddTransaction(account.account.id) }
                 )
             }
         }
@@ -111,20 +111,20 @@ fun AccountCard(
                 modifier = Modifier
                     .size(48.dp)
                     .clip(CircleShape)
-                    .background(Color(account.color).copy(alpha = 0.2f)),
+                    .background(Color(account.account.color).copy(alpha = 0.2f)),
                 contentAlignment = Alignment.Center
             ) {
                 Icon(
                     Icons.Default.AccountBalance,
                     null,
-                    tint = Color(account.color),
+                    tint = Color(account.account.color),
                     modifier = Modifier.size(24.dp)
                 )
             }
             Spacer(Modifier.width(16.dp))
             Column(modifier = Modifier.weight(1f)) {
-                Text(account.name, fontWeight = FontWeight.SemiBold)
-                Text(account.type.name, style = MaterialTheme.typography.bodySmall,
+                Text(account.account.name, fontWeight = FontWeight.SemiBold)
+                Text(account.account.type.name, style = MaterialTheme.typography.bodySmall,
                     color = MaterialTheme.colorScheme.onSurfaceVariant)
             }
             Column(horizontalAlignment = Alignment.End) {

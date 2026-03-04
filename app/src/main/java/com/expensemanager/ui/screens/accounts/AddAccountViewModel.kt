@@ -4,6 +4,7 @@ import androidx.lifecycle.ViewModel
 import androidx.lifecycle.viewModelScope
 import com.expensemanager.data.local.dao.AccountDao
 import com.expensemanager.data.local.entities.AccountEntity
+import com.expensemanager.data.local.entities.AccountType
 import dagger.hilt.android.lifecycle.HiltViewModel
 import kotlinx.coroutines.launch
 import java.util.*
@@ -16,7 +17,7 @@ class AddAccountViewModel @Inject constructor(
 
     var name = ""
     var number = ""
-    var type = "General"
+    var type: AccountType = AccountType.BANK
     var initialValue = ""
     var currency = detectCurrency()
     var color: Long = 0xFF00C853
@@ -28,27 +29,22 @@ class AddAccountViewModel @Inject constructor(
             error = "Account name required"
             return
         }
-
         viewModelScope.launch {
             accountDao.insert(
                 AccountEntity(
-                    name = name,
+                    name          = name,
                     accountNumber = number.takeIf { it.isNotBlank() },
-                    type = type,
-                    initialValue = initialValue.toDoubleOrNull() ?: 0.0,
-                    currency = currency,
-                    color = color
+                    type          = type,
+                    initialValue  = initialValue.toDoubleOrNull() ?: 0.0,
+                    currency      = currency,
+                    color         = color
                 )
             )
             onSuccess()
         }
     }
 
-    private fun detectCurrency(): String {
-        return try {
-            Currency.getInstance(Locale.getDefault()).currencyCode
-        } catch (e: Exception) {
-            "INR"
-        }
-    }
+    private fun detectCurrency(): String = try {
+        Currency.getInstance(Locale.getDefault()).currencyCode
+    } catch (e: Exception) { "INR" }
 }

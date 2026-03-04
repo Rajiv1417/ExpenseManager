@@ -32,26 +32,31 @@ class TransactionRepository @Inject constructor(
         limit: Int = 50,
         offset: Int = 0
     ): Flow<List<TransactionEntity>> = transactionDao.getFilteredTransactions(
-        accountId = accountId,
+        accountId  = accountId,
         categoryId = categoryId,
-        type = type?.name,
-        minAmount = minAmount,
-        maxAmount = maxAmount,
-        from = from,
-        to = to,
-        limit = limit,
-        offset = offset
+        type       = type?.name,
+        minAmount  = minAmount,
+        maxAmount  = maxAmount,
+        from       = from,
+        to         = to,
+        limit      = limit,
+        offset     = offset
     )
 
-    suspend fun insertTransaction(transaction: TransactionEntity): Long {
-        val id = transactionDao.insertTransaction(transaction)
-        
-    }
+    suspend fun insertTransaction(transaction: TransactionEntity): Long =
+        transactionDao.insertTransaction(transaction)
 
-    suspend fun insertTransactions(transactions: List<TransactionEntity>) {
+    suspend fun insertTransactions(transactions: List<TransactionEntity>) =
         transactions.forEach { insertTransaction(it) }
-    }
-    suspend fun getTransactionById(id: Long): TransactionEntity? = transactionDao.getTransactionById(id)
+
+    suspend fun updateTransaction(old: TransactionEntity, new: TransactionEntity) =
+        transactionDao.updateTransaction(new)
+
+    suspend fun deleteTransaction(transaction: TransactionEntity) =
+        transactionDao.deleteTransaction(transaction)
+
+    suspend fun getTransactionById(id: Long): TransactionEntity? =
+        transactionDao.getTransactionById(id)
 
     fun getTotalIncome(from: LocalDateTime, to: LocalDateTime): Flow<Double?> =
         transactionDao.getTotalIncome(from, to)

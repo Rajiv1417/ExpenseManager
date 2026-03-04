@@ -29,7 +29,7 @@ import androidx.compose.material.icons.filled.CreditCard
 import androidx.compose.material.icons.filled.CurrencyBitcoin
 import androidx.compose.material.icons.filled.Home
 import androidx.compose.material.icons.filled.Notifications
-import androidx.compose.material.icons.filled.ReceiptLong
+import androidx.compose.material.icons.automirrored.filled.ReceiptLong
 import androidx.compose.material.icons.filled.Savings
 import androidx.compose.material.icons.filled.Settings
 import androidx.compose.material3.Card
@@ -128,11 +128,11 @@ fun DashboardScreen(
                     verticalArrangement = Arrangement.spacedBy(12.dp),
                     horizontalArrangement = Arrangement.spacedBy(12.dp)
                 ) {
-                    items(uiState.accounts, key = { it.id }) { account ->
+                    items(uiState.accounts, key = { it.account.id }) { account ->
                         DashboardAccountCard(
                             account = account,
-                            onClick = { onAccountDetailsClick(account.id) },
-                            onLongInfo = { onAccountRecordsClick(account.id) }
+                            onClick = { onAccountDetailsClick(account.account.id) },
+                            onLongInfo = { onAccountRecordsClick(account.account.id) }
                         )
                     }
 
@@ -315,7 +315,7 @@ private fun DashboardAccountCard(
                         Icon(icon, contentDescription = null, tint = Color.White, modifier = Modifier.size(18.dp))
                     }
                     Text(
-                        text = account.type.name,
+                        text = account.account.type.name,
                         color = Color.White.copy(alpha = 0.85f),
                         style = MaterialTheme.typography.labelSmall,
                         fontWeight = FontWeight.Bold,
@@ -339,7 +339,7 @@ private fun DashboardAccountCard(
                         verticalAlignment = Alignment.CenterVertically
                     ) {
                         Text(
-                            account.name,
+                            account.account.name,
                             color = Color.White.copy(alpha = 0.72f),
                             style = MaterialTheme.typography.labelSmall,
                             maxLines = 1,
@@ -367,8 +367,8 @@ private fun DashboardAccountCard(
 private fun accountVisuals(account: AccountWithBalance): Triple<Color, Color, androidx.compose.ui.graphics.vector.ImageVector> {
     return when {
         account.balance < 0 -> Triple(Color(0xFF1A2C38), Color(0xFF2C3E50), Icons.Default.CreditCard)
-        account.type.name.contains("SAV", ignoreCase = true) -> Triple(Color(0xFFFF712B), Color(0xFFFF4B6E), Icons.Default.Savings)
-        account.type.name.contains("CRYPTO", ignoreCase = true) -> Triple(Color(0xFF4F46E5), Color(0xFF7C3AED), Icons.Default.CurrencyBitcoin)
+        account.account.type.name.contains("SAV", ignoreCase = true) -> Triple(Color(0xFFFF712B), Color(0xFFFF4B6E), Icons.Default.Savings)
+        account.account.type.name.contains("CRYPTO", ignoreCase = true) -> Triple(Color(0xFF4F46E5), Color(0xFF7C3AED), Icons.Default.CurrencyBitcoin)
         else -> Triple(Color(0xFF10221B), Color(0xFF00B67B), Icons.Default.AccountBalance)
     }
 }
@@ -424,7 +424,7 @@ private fun LiquidBottomNav(
             verticalAlignment = Alignment.Bottom
         ) {
             BottomNavItem("Home", Icons.Default.Home, false, onHomeClick)
-            BottomNavItem("Records", Icons.Default.ReceiptLong, false, onRecordsClick)
+            BottomNavItem("Records", Icons.AutoMirrored.Filled.ReceiptLong, false, onRecordsClick)
             Spacer(modifier = Modifier.size(52.dp))
             BottomNavItem("Accounts", Icons.Default.CreditCard, true, onAccountsClick)
             BottomNavItem("Settings", Icons.Default.Settings, false, onSettingsClick)

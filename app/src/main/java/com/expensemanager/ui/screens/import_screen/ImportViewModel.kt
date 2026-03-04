@@ -77,7 +77,7 @@ class ImportViewModel @Inject constructor(
             _uiState.update { it.copy(isImporting = true, error = null) }
 
             val defaultAccountId = accountRepository.getAllAccounts()
-                .first().firstOrNull()?.id ?: run {
+                .first().firstOrNull()?.account?.id ?: run {
                 _uiState.update { it.copy(error = "No accounts found. Please add an account first.", isImporting = false) }
                 return@launch
             }

@@ -3,6 +3,7 @@ package com.expensemanager.ui.screens.accounts
 import androidx.lifecycle.ViewModel
 import androidx.lifecycle.viewModelScope
 import com.expensemanager.data.local.entities.AccountEntity
+import com.expensemanager.data.local.entities.AccountType
 import com.expensemanager.data.local.entities.AccountWithBalance
 import com.expensemanager.data.repository.AccountRepository
 import dagger.hilt.android.lifecycle.HiltViewModel

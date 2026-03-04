@@ -54,8 +54,9 @@ class SmsReceiver : BroadcastReceiver() {
     private suspend fun saveParsedTransaction(parsed: ParsedSmsTransaction) {
         try {
             // Find matching account by last4 digits or bank name
-            val accounts = mutableListOf<com.expensemanager.data.local.entities.AccountEntity>()
-            accountRepository.getAllAccounts().collect { accounts.addAll(it) }
+            val accountsWithBalance = mutableListOf<com.expensemanager.data.local.entities.AccountWithBalance>()
+            accountRepository.getAllAccounts().collect { accountsWithBalance.addAll(it) }
+            val accounts = accountsWithBalance.map { it.account }
 
             val matchedAccount = accounts.firstOrNull { account ->
                 parsed.accountLast4?.let { account.name.contains(it) } == true ||

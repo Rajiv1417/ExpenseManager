@@ -110,7 +110,7 @@ fun AddTransactionScreen(
             if (uiState.transactionType == TransactionType.TRANSFER) {
                 FormField(label = "To Account") {
                     AccountDropdown(
-                        accounts = uiState.accounts.filter { it.id != uiState.selectedAccount?.id },
+                        accounts = uiState.accounts.filter { it.account.id != uiState.selectedAccount?.account?.id },
                         selected = uiState.selectedToAccount,
                         onSelected = { viewModel.setToAccount(it) }
                     )
