@@ -1,4 +1,5 @@
 package com.expensemanager.ui.screens.addtransaction
+@file:OptIn(ExperimentalMaterial3Api::class)
 
 import android.app.DatePickerDialog
 import android.app.TimePickerDialog
@@ -85,8 +86,6 @@ import com.expensemanager.ui.theme.IncomeColor
 import com.expensemanager.ui.theme.TransferColor
 import java.time.LocalDateTime
 import java.time.format.DateTimeFormatter
-
-@file:OptIn(ExperimentalMaterial3Api::class)
 
 @Composable
 fun AddTransactionScreen(
