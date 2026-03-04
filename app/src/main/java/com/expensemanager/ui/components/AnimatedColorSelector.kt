@@ -1,8 +1,7 @@
 package com.expensemanager.ui.components
 
-import android.content.Context
 import android.os.VibrationEffect
-import android.os.Vibrator
+import androidx.core.content.ContextCompat
 import androidx.compose.animation.core.animateFloatAsState
 import androidx.compose.foundation.background
 import androidx.compose.foundation.clickable
@@ -41,9 +40,8 @@ fun AnimatedColorSelector(
                     .clip(CircleShape)
                     .background(color)
                     .clickable {
-                        val vibrator =
-                            context.getSystemService(Context.VIBRATOR_SERVICE) as Vibrator
-                        vibrator.vibrate(
+                        val vibrator = ContextCompat.getSystemService(context, android.os.Vibrator::class.java)
+                        vibrator?.vibrate(
                             VibrationEffect.createOneShot(
                                 30,
                                 VibrationEffect.DEFAULT_AMPLITUDE

@@ -20,27 +20,27 @@ interface AccountDao {
     @Query("SELECT * FROM accounts WHERE id = :id")
     suspend fun getAccountById(id: Long): AccountEntity?
 
-     @Query("""
-SELECT 
-    a.*,
-    a.initialValue
-    + COALESCE(SUM(
-        CASE 
-            WHEN t.type = 'INCOME' AND t.accountId = a.id THEN t.amount
-            WHEN t.type = 'EXPENSE' AND t.accountId = a.id THEN -t.amount
-            WHEN t.type = 'TRANSFER' AND t.accountId = a.id THEN -t.amount
-            WHEN t.type = 'TRANSFER' AND t.toAccountId = a.id THEN t.amount
-            ELSE 0
-        END
-    ), 0) AS balance
-FROM accounts a
-LEFT JOIN transactions t
-ON t.accountId = a.id OR t.toAccountId = a.id
-GROUP BY a.id
-ORDER BY a.createdAt DESC
-""")
-@Query("SELECT * FROM accounts ORDER BY createdAt DESC")
+    @Query("SELECT * FROM accounts ORDER BY createdAt DESC")
     suspend fun getAllAccountsOnce(): List<AccountEntity>
 
+    @Query("""
+        SELECT 
+            a.*,
+            a.initialValue
+            + COALESCE(SUM(
+                CASE 
+                    WHEN t.status IN ('CLEARED', 'RECONCILED') AND t.type = 'INCOME' AND t.accountId = a.id THEN t.amount
+                    WHEN t.status IN ('CLEARED', 'RECONCILED') AND t.type = 'EXPENSE' AND t.accountId = a.id THEN -t.amount
+                    WHEN t.status IN ('CLEARED', 'RECONCILED') AND t.type = 'TRANSFER' AND t.accountId = a.id THEN -t.amount
+                    WHEN t.status IN ('CLEARED', 'RECONCILED') AND t.type = 'TRANSFER' AND t.toAccountId = a.id THEN t.amount
+                    ELSE 0
+                END
+            ), 0) AS balance
+        FROM accounts a
+        LEFT JOIN transactions t
+        ON t.accountId = a.id OR t.toAccountId = a.id
+        GROUP BY a.id
+        ORDER BY a.createdAt DESC
+    """)
     fun getAccountsWithBalance(): Flow<List<AccountWithBalance>>
 }
