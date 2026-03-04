@@ -56,7 +56,7 @@ class AccountsViewModel @Inject constructor(
         type: AccountType,
         balance: Double,
         color: Long,
-        symbol: String?
+        symbol: String
     ) {
         viewModelScope.launch {
             accountRepository.insertAccount(
@@ -72,7 +72,6 @@ class AccountsViewModel @Inject constructor(
             )
         }
     }
-}
 
     fun updateAccount(
         account: AccountEntity,
